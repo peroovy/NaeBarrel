@@ -16,3 +16,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/api/cases', [\App\Http\Controllers\CaseApiController::class, "cases"]);
+
+Route::get('/api/cases/{case}', [\App\Http\Controllers\CaseApiController::class, "index"]);
+
+Route::get('/api/cases/{case}/items', [\App\Http\Controllers\CaseApiController::class, "items"]);

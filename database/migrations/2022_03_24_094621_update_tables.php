@@ -28,7 +28,7 @@ return new class extends Migration
 
         if (Schema::hasTable('clients')) {
             Schema::table('clients', function (Blueprint $table) {
-                $table->bigInteger('balance')->nullable(false)->change();
+                $table->bigInteger('balance')->default(0)->nullable(false)->change();
                 $table->dropForeign('clients_permission_foreign');
                 $table->foreignId('permission')->change()->constrained('permissions')->nullOnDelete();
             });
@@ -92,19 +92,25 @@ return new class extends Migration
         Schema::table('clients', function (Blueprint $table) {
             $table->bigInteger('balance')->nullable(true)->change();
             $table->integer('permission')->change();
+            $table->dropForeign(['permission']);
             $table->foreign('permission')->references('id')->on('permissions');
         });
 
         Schema::table('transactions', function (Blueprint $table) {
             $table->bigInteger('accrual')->nullable(true)->change();
             $table->integer('type')->change();
+            $table->bigInteger('client_id')->nullable(false)->change();
+            $table->dropForeign(['client_id']);
+            $table->dropForeign(['type']);
             $table->foreign('type')->references('id')->on('trans_types');
+            $table->foreign('client_id')->references('id')->on('clients');
         });
 
         Schema::table('items', function (Blueprint $table) {
             $table->string('description')->nullable(true)->change();
             $table->bigInteger('price')->nullable(true)->default('0')->change();
-            $table->integer('quality')->change();
+            $table->integer('quality')->nullable(false)->change();
+            $table->dropForeign(['quality']);
             $table->foreign('quality')->references('id')->on('qualities');
         });
 
@@ -112,14 +118,18 @@ return new class extends Migration
             $table->float('chance')->nullable(true)->change();
             $table->bigInteger('case_id')->change();
             $table->bigInteger('item_id')->change();
+            $table->dropForeign(['case_id']);
+            $table->dropForeign(['item_id']);
             $table->foreign('case_id')->references('id')->on('cases');
             $table->foreign('item_id')->references('id')->on('items');
         });
 
         Schema::table('inventories', function (Blueprint $table) {
             $table->bigInteger('client_id')->change();
-            $table->foreign('client_id')->references('id')->on('clients');
             $table->bigInteger('item_id')->change();
+            $table->dropForeign(['client_id']);
+            $table->dropForeign(['item_id']);
+            $table->foreign('client_id')->references('id')->on('clients');
             $table->foreign('item_id')->references('id')->on('items');
         });
     }

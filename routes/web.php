@@ -3,6 +3,7 @@
 use App\Http\Controllers\CaseApiController;
 use App\Http\Controllers\EnumApiController;
 use App\Http\Controllers\ItemApiController;
+use App\Http\Controllers\TransactionApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,3 +32,7 @@ Route::get('/api/qualities', [EnumApiController::class, "qualities"]);
 Route::get('/api/items', [ItemApiController::class, "items"]);
 Route::get('/api/items/{item_id}', [ItemApiController::class, "index"]);
 Route::get('/api/items/quality/{quality_id}', [ItemApiController::class, "quality"]);
+
+Route::get('/api/transactions', [TransactionApiController::class, "transactions"]);
+Route::get('/api/transactions/{transaction_id}', [TransactionApiController::class, "index"]);
+Route::get('/api/transactions/type/{type_id}', [TransactionApiController::class, "type"]);

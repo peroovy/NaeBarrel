@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CaseApiController;
+use App\Http\Controllers\EnumApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,8 +19,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/api/cases', [\App\Http\Controllers\CaseApiController::class, "cases"]);
+Route::get('/api/cases', [CaseApiController::class, "cases"]);
+Route::get('/api/cases/{case}', [CaseApiController::class, "index"]);
+Route::get('/api/cases/{case}/items', [CaseApiController::class, "items"]);
 
-Route::get('/api/cases/{case}', [\App\Http\Controllers\CaseApiController::class, "index"]);
-
-Route::get('/api/cases/{case}/items', [\App\Http\Controllers\CaseApiController::class, "items"]);
+Route::get('/api/transaction_types', [EnumApiController::class, "transaction_type"]);
+Route::get('/api/permissions', [EnumApiController::class, "permissions"]);
+Route::get('/api/qualities', [EnumApiController::class, "qualities"]);

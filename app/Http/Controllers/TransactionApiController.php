@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transaction;
+use App\Models\TransactionType;
 use Illuminate\Http\Request;
 
 class TransactionApiController extends Controller
@@ -15,8 +16,7 @@ class TransactionApiController extends Controller
         return $transaction_id;
     }
 
-    public function type(int $type_id) {
-        return Transaction::all()
-            ->where('type', '=', $type_id);
+    public function type(TransactionType $type_id) {
+        return $type_id->transactions;
     }
 }

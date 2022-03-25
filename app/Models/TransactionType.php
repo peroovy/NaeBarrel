@@ -10,4 +10,8 @@ class TransactionType extends Model
     use HasFactory;
 
     protected $table = "transaction_types";
+
+    public function transactions() {
+        return $this->hasMany(Transaction::class, 'type');
+    }
 }

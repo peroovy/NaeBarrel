@@ -16,8 +16,7 @@ class ItemApiController extends Controller
         return $item_id;
     }
 
-    public function quality(int $quality_id) {
-        return Item::all()
-            ->where('quality', '=', $quality_id);
+    public function quality(Quality $quality_id) {
+        return $quality_id->items;
     }
 }

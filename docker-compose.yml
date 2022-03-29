@@ -8,6 +8,7 @@ services:
         build: .
         container_name: app
         command: make migrate run h="0.0.0.0"
+        restart: always
         env_file:
             - .env
         environment:

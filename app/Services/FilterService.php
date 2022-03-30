@@ -15,4 +15,12 @@ class FilterService
         }
         return $collection;
     }
+
+    public function ManyFilters(Collection $collection, array $filters): Collection
+    {
+        foreach ($filters as $filterName => $columnName) {
+            $collection = $this->GetFiltered($collection, $filterName, $columnName);
+        }
+        return $collection;
+    }
 }

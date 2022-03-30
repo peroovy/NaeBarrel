@@ -26,4 +26,8 @@ class Transaction extends Model
     use HasFactory;
 
     protected $table = "transactions";
+
+    public function GetType() {
+        return $this->hasOne(TransactionType::class, 'id', 'type')->get();
+    }
 }

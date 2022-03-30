@@ -17,7 +17,7 @@ class ItemApiController extends Controller
     }
 
     public function items() {
-        return ItemResource::collection($this->service->getAll());
+        return ItemResource::collection($this->service->GetAll());
     }
 
     public function index(Item $item_id) {

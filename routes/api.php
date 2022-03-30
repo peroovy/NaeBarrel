@@ -34,4 +34,3 @@ Route::get('/items/{item_id}', [ItemApiController::class, "index"]);
 
 Route::get('/transactions', [TransactionApiController::class, "transactions"]);
 Route::get('/transactions/{transaction_id}', [TransactionApiController::class, "index"]);
-Route::get('/transactions/type/{type_id}', [TransactionApiController::class, "type"]);

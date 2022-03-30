@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\CaseApiController;
+use App\Http\Controllers\EnumApiController;
+use App\Http\Controllers\ItemApiController;
+use App\Http\Controllers\TransactionApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,3 +21,18 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/cases', [CaseApiController::class, "cases"]);
+Route::get('/cases/{case}', [CaseApiController::class, "index"]);
+
+Route::get('/transaction_types', [EnumApiController::class, "transaction_type"]);
+Route::get('/permissions', [EnumApiController::class, "permissions"]);
+Route::get('/qualities', [EnumApiController::class, "qualities"]);
+
+Route::get('/items', [ItemApiController::class, "items"]);
+Route::get('/items/{item_id}', [ItemApiController::class, "index"]);
+Route::get('/items/quality/{quality_id}', [ItemApiController::class, "quality"]);
+
+Route::get('/transactions', [TransactionApiController::class, "transactions"]);
+Route::get('/transactions/{transaction_id}', [TransactionApiController::class, "index"]);
+Route::get('/transactions/type/{type_id}', [TransactionApiController::class, "type"]);

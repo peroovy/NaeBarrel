@@ -12,7 +12,7 @@ class CaseApiController extends Controller
         return CaseResource::collection(NBCase::all());
     }
 
-    public function index(NBCase $case) {
-        return new CaseResource($case);
+    public function index(NBCase $case_id) {
+        return new CaseResource($case_id);
     }
 }

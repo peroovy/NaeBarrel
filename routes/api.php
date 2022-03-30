@@ -23,7 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/cases', [CaseApiController::class, "cases"]);
-Route::get('/cases/{case}', [CaseApiController::class, "index"]);
+Route::get('/cases/{case_id}', [CaseApiController::class, "index"]);
 
 Route::get('/transaction_types', [EnumApiController::class, "transaction_type"]);
 Route::get('/permissions', [EnumApiController::class, "permissions"]);

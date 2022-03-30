@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ItemResource;
 use App\Models\Item;
 use App\Models\Quality;
 use App\Services\ItemService;
@@ -16,10 +17,10 @@ class ItemApiController extends Controller
     }
 
     public function items() {
-        return $this->service->getAll();
+        return ItemResource::collection($this->service->getAll());
     }
 
     public function index(Item $item_id) {
-        return $item_id;
+        return new ItemResource($item_id);
     }
 }

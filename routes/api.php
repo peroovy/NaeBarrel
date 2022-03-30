@@ -31,7 +31,6 @@ Route::get('/qualities', [EnumApiController::class, "qualities"]);
 
 Route::get('/items', [ItemApiController::class, "items"]);
 Route::get('/items/{item_id}', [ItemApiController::class, "index"]);
-Route::get('/items/quality/{quality_id}', [ItemApiController::class, "quality"]);
 
 Route::get('/transactions', [TransactionApiController::class, "transactions"]);
 Route::get('/transactions/{transaction_id}', [TransactionApiController::class, "index"]);

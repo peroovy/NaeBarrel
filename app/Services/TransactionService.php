@@ -8,7 +8,7 @@ class TransactionService
 {
     public function GetAll() {
         $filter = new FilterService();
-        return $filter->ManyFilters(Transaction::all(), [
+        return $filter->ManyFilters(Transaction::all()->sortBy('id'), [
             "client" => "client_id",
             "type" => "type"
         ]);

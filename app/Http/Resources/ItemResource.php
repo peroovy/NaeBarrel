@@ -14,7 +14,7 @@ class ItemResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
+        $item = [
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
@@ -22,5 +22,9 @@ class ItemResource extends JsonResource
             'quality' => $this->getQuality(),
             'picture' => $this->picture
         ];
+        if ($this->chance != null) {
+            $item['chance'] = $this->chance;
+        }
+        return $item;
     }
 }

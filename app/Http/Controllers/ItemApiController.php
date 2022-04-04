@@ -2,21 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ItemResource;
 use App\Models\Item;
 use App\Models\Quality;
+use App\Services\ItemService;
 use Illuminate\Http\Request;
 
 class ItemApiController extends Controller
 {
+    private ItemService $service;
+    public function __construct(ItemService $service)
+    {
+        $this->service = $service;
+    }
+
     public function items() {
-        return Item::all();
+        return ItemResource::collection($this->service->GetAll());
     }
 
     public function index(Item $item_id) {
-        return $item_id;
-    }
-
-    public function quality(Quality $quality_id) {
-        return $quality_id->items;
+        return new ItemResource($item_id);
     }
 }

@@ -31,9 +31,7 @@ class Item extends Model
 
     protected $table = 'items';
 
-    public function quality(): Quality
-    {
-        return $this->hasOne(Quality::class, 'id', 'quality')
-            ->getResults();
+    public function getQuality() {
+        return $this->hasOne(Quality::class, 'id', 'quality')->get();
     }
 }

@@ -32,8 +32,9 @@ class NBCase extends Model
     protected $table = 'cases';
 
     public function items() {
-        return $this->hasMany(CaseItem::class, 'case_id')
+        return $this->hasManyThrough(Item::class, CaseItem::class,
+        'case_id', 'id', 'id', 'item_id')
             ->select('items.*', 'case_item.chance')
-            ->join('items', 'case_item.item_id', '=', 'items.id');
+            ->get();
     }
 }

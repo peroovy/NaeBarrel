@@ -31,6 +31,9 @@ migrate:
 reset:
 	php artisan migrate:reset ${o}
 
+fresh:
+	php artisan migrate:fresh ${o}
+
 refresh:
 	php artisan migrate:refresh ${o}
 
@@ -38,10 +41,13 @@ rollback:
 	php artisan migrate:rollback ${o}
 
 migration:
-	php artisan make:migration ${n}
+	php artisan make:migration "${n}"
 
 controller:
 	php artisan make:controller ${o} ${n}
+
+enum:
+	php artisan make:enum ${o} ${n}
 
 resource:
 	php artisan make:resource ${o} ${n}

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthorizationController;
 use App\Http\Controllers\CaseApiController;
 use App\Http\Controllers\EnumApiController;
 use App\Http\Controllers\ItemApiController;
@@ -19,30 +20,36 @@ use \App\Http\Controllers\ClientsController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-Route::prefix('clients')->group(function ()
+Route::prefix('auth')->group(function ()
 {
-    Route::get('/', [ClientsController::class, 'all']);
-    Route::prefix('/{identifier}')->group(function ()
-    {
-        Route::get('/', [ClientsController::class, 'client']);
-        Route::get('/inventory', [ClientsController::class, 'inventory']);
-    });
+    Route::post('register', [AuthorizationController::class, 'register']);
+    Route::post('login', [AuthorizationController::class, 'login']);
+    Route::post('logout', [AuthorizationController::class, 'logout']);
 });
 
-Route::get('/cases', [CaseApiController::class, "cases"]);
-Route::get('/cases/{case_id}', [CaseApiController::class, "index"]);
+Route::middleware('auth:sanctum')->group(function ()
+{
+    Route::prefix('clients')->group(function ()
+    {
+        Route::get('/', [ClientsController::class, 'all']);
+        Route::prefix('/{identifier}')->group(function ()
+        {
+            Route::get('/', [ClientsController::class, 'client']);
+            Route::get('/inventory', [ClientsController::class, 'inventory']);
+        });
+    });
 
-Route::get('/transaction_types', [EnumApiController::class, "transaction_type"]);
-Route::get('/permissions', [EnumApiController::class, "permissions"]);
-Route::get('/qualities', [EnumApiController::class, "qualities"]);
+    Route::get('/cases', [CaseApiController::class, "cases"]);
+    Route::get('/cases/{case_id}', [CaseApiController::class, "index"]);
 
-Route::get('/items', [ItemApiController::class, "items"]);
-Route::get('/items/{item_id}', [ItemApiController::class, "index"]);
+    Route::get('/transaction_types', [EnumApiController::class, "transaction_type"]);
+    Route::get('/permissions', [EnumApiController::class, "permissions"]);
+    Route::get('/qualities', [EnumApiController::class, "qualities"]);
 
-Route::get('/transactions', [TransactionApiController::class, "transactions"]);
-Route::get('/transactions/{transaction_id}', [TransactionApiController::class, "index"]);
+    Route::get('/items', [ItemApiController::class, "items"]);
+    Route::get('/items/{item_id}', [ItemApiController::class, "index"]);
+
+    Route::get('/transactions', [TransactionApiController::class, "transactions"]);
+    Route::get('/transactions/{transaction_id}', [TransactionApiController::class, "index"]);
+
+});

@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
 
 
 /**
@@ -26,9 +28,21 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Client wherePermission($value)
  * @mixin \Eloquent
  */
-class Client extends Model
+class Client extends Model implements \Illuminate\Contracts\Auth\Authenticatable
 {
-    use HasFactory;
+    use HasApiTokens, HasFactory, Authenticatable;
+
+    protected $fillable = [
+        'login',
+        'email',
+        'password',
+        'permission'
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
     protected $table = 'clients';
 

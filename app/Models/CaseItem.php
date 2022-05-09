@@ -23,6 +23,16 @@ class CaseItem extends Model
 {
     use HasFactory;
 
+    public $incrementing = false;
+    public $timestamps = false;
+    protected $primaryKey = ["case_id", "item_id"];
+
+    protected $fillable = [
+        "case_id",
+        "item_id",
+        "chance"
+    ];
+
     protected $table = 'case_item';
 
 }

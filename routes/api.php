@@ -27,6 +27,8 @@ Route::prefix('auth')->group(function ()
     Route::post('logout', [AuthorizationController::class, 'logout']);
 });
 
+Route::post('/cases', [CaseApiController::class, 'create']);
+
 Route::middleware('auth:sanctum')->group(function ()
 {
     Route::prefix('clients')->group(function ()

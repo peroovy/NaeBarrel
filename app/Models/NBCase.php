@@ -29,7 +29,16 @@ class NBCase extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $table = 'cases';
+
+    protected $fillable = [
+        "name",
+        "description",
+        "price",
+        "picture"
+    ];
 
     public function items() {
         return $this->hasManyThrough(Item::class, CaseItem::class,

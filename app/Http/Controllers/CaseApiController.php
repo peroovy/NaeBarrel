@@ -42,14 +42,12 @@ class CaseApiController extends Controller
 
         $withItems = array_key_exists("items", $request->all());
 
+
         if ($withItems) {
-            //исправить
-            foreach (array_keys($request["items"]) as $item_id) {
-                if (!Item::whereId($item_id)->exists()) {
-                    return response(status: 400);
-                }
-            }
-            if (array_sum($request["items"]) != 1) {
+            $item_ids = array_keys($request["items"]);
+            $items = Item::findMany($item_ids);
+            if (count($items) != count($item_ids) ||
+                array_sum($request["items"]) != 1) {
                 return response(status: 400);
             }
         }

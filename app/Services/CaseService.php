@@ -23,14 +23,15 @@ class CaseService
             'price' => $price,
             'picture' => $picture
         ]);
+        $case_items = [];
         foreach ($items as $item_id => $chance) {
-            //createMany
-            CaseItem::create([
+            $case_items[] =[
                 "case_id" => $case["id"],
                 "item_id" => $item_id,
                 "chance" => $chance
-            ]);
+            ];
         }
+        CaseItem::insert($case_items);
         return $case;
     }
 }

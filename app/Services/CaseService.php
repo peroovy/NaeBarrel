@@ -40,7 +40,7 @@ class CaseService
     public function OpenCase(NBCase $case) {
         $items = $case->items();
         if (count($items) == 0) {
-            return response(status: 400);
+            return null;
         }
         $winning = random_int(1, 100) / 100;
         $curr = 0.0;

@@ -77,6 +77,9 @@ class CaseApiController extends Controller
             return "нету денег";
         }
         $item = $this->service->OpenCase($case_id);
+        if ($item == null) {
+            return response(status: 400);
+        }
         $this->clientService->AddItem($user->id, $item["id"]);
         return new ItemResource($item);
     }

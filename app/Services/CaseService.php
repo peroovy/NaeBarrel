@@ -37,16 +37,11 @@ class CaseService
         return $case;
     }
 
-    public function BuyCase(Client $user, NBCase $case) {
-        $price = $case->price;
-        if ($user->balance < $price) {
-            return response(status: 400);
-        }
+    public function OpenCase(NBCase $case) {
         $items = $case->items();
         if (count($items) == 0) {
             return response(status: 400);
         }
-        Client::whereEmail($user->email)->decrement("balance", $price);
         $winning = random_int(1, 100) / 100;
         $curr = 0.0;
         foreach ($items as $item) {

@@ -31,4 +31,14 @@ class ClientService
                 'client_id', 'id', 'id', 'item_id')
             ->getResults();
     }
+
+    public function DecreaseBalance(string|int $identifier, int $count): bool
+    {
+        $client = $this->get_client_by_identifier($identifier);
+        if ($client->balance < $count) {
+            return false;
+        }
+        $client->decrement("balance", $count);
+        return true;
+    }
 }

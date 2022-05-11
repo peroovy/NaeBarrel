@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Item;
 use App\Models\NBCase;
 use App\Services\CaseService;
+use App\Services\ClientService;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,10 +16,12 @@ use Illuminate\Support\Facades\Validator;
 class CaseApiController extends Controller
 {
     private CaseService $service;
+    private ClientService $clientService;
 
-    public function __construct(CaseService $service)
+    public function __construct(CaseService $service, ClientService $clientService)
     {
         $this->service = $service;
+        $this->clientService = $clientService;
     }
 
     public function cases() {
@@ -68,6 +71,9 @@ class CaseApiController extends Controller
     }
 
     public function buy(NBCase $case_id) {
-        return $this->service->BuyCase(Auth::user(), $case_id);
+        if (!$this->clientService->DecreaseBalance(Auth::user()->id, $case_id->price)) {
+            return "нету денег";
+        }
+        return $this->service->OpenCase($case_id);
     }
 }

@@ -41,4 +41,12 @@ class ClientService
         $client->decrement("balance", $count);
         return true;
     }
+
+    public function AddItem(string|int $identifier, int $item_id) {
+        $client = $this->get_client_by_identifier($identifier);
+        Inventory::create([
+            "client_id" => $client->id,
+            "item_id" => $item_id
+        ]);
+    }
 }

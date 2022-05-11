@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\CaseResource;
+use App\Http\Resources\ItemResource;
 use App\Models\Client;
 use App\Models\Item;
 use App\Models\NBCase;
@@ -71,9 +72,12 @@ class CaseApiController extends Controller
     }
 
     public function buy(NBCase $case_id) {
-        if (!$this->clientService->DecreaseBalance(Auth::user()->id, $case_id->price)) {
+        $user = Auth::user();
+        if (!$this->clientService->DecreaseBalance($user->id, $case_id->price)) {
             return "нету денег";
         }
-        return $this->service->OpenCase($case_id);
+        $item = $this->service->OpenCase($case_id);
+        $this->clientService->AddItem($user->id, $item["id"]);
+        return new ItemResource($item);
     }
 }

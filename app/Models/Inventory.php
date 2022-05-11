@@ -10,4 +10,11 @@ class Inventory extends Model
     use HasFactory;
 
     protected $table = 'inventories';
+
+    protected $fillable = [
+        "client_id",
+        "item_id"
+    ];
+
+    public $timestamps = false;
 }

@@ -47,9 +47,9 @@ class CaseService
         foreach ($items as $item) {
             $curr += $item["chance"];
             if ($winning <= $curr) {
-                return new ItemResource($item);
+                return $item;
             }
         }
-        return new ItemResource($items->last());
+        return $items->last();
     }
 }

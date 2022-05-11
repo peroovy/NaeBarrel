@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\CaseResource;
+use App\Models\Client;
 use App\Models\Item;
 use App\Models\NBCase;
 use App\Services\CaseService;
 use http\Env\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class CaseApiController extends Controller
@@ -63,5 +65,9 @@ class CaseApiController extends Controller
             return new CaseResource($case);
         }
         return response(status: 400);
+    }
+
+    public function buy(NBCase $case_id) {
+        return $this->service->BuyCase(Auth::user(), $case_id);
     }
 }

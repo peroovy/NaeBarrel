@@ -27,8 +27,6 @@ Route::prefix('auth')->group(function ()
     Route::post('logout', [AuthorizationController::class, 'logout']);
 });
 
-Route::post('/cases', [CaseApiController::class, 'create']);
-
 Route::middleware('auth:sanctum')->group(function ()
 {
     Route::prefix('clients')->group(function ()
@@ -43,6 +41,8 @@ Route::middleware('auth:sanctum')->group(function ()
 
     Route::get('/cases', [CaseApiController::class, "cases"]);
     Route::get('/cases/{case_id}', [CaseApiController::class, "index"]);
+    Route::post('/cases/{case_id}/buy', [CaseApiController::class, 'buy']);
+    Route::post('/cases', [CaseApiController::class, 'create']);
 
     Route::get('/transaction_types', [EnumApiController::class, "transaction_type"]);
     Route::get('/permissions', [EnumApiController::class, "permissions"]);

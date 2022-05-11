@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Http\Resources\ItemResource;
 use App\Models\CaseItem;
+use App\Models\Client;
 use App\Models\NBCase;
 
 class CaseService
@@ -33,5 +35,26 @@ class CaseService
         }
         CaseItem::insert($case_items);
         return $case;
+    }
+
+    public function BuyCase(Client $user, NBCase $case) {
+        $price = $case->price;
+        if ($user->balance < $price) {
+            return response(status: 400);
+        }
+        $items = $case->items();
+        if (count($items) == 0) {
+            return response(status: 400);
+        }
+        Client::whereEmail($user->email)->decrement("balance", $price);
+        $winning = random_int(1, 100) / 100;
+        $curr = 0.0;
+        foreach ($items as $item) {
+            $curr += $item["chance"];
+            if ($winning <= $curr) {
+                return new ItemResource($item);
+            }
+        }
+        return new ItemResource($items->last());
     }
 }

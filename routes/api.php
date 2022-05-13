@@ -54,6 +54,7 @@ Route::middleware('auth:sanctum')->group(function ()
         Route::get('/', [ItemApiController::class, "items"]);
         Route::post('/', [ItemApiController::class, "create"])->middleware("moderator");
         Route::get('/{item_id}', [ItemApiController::class, "index"]);
+        Route::post('/sell', [ItemApiController::class, "sell"]);
     });
 
     Route::get('/transactions', [TransactionApiController::class, "transactions"]);

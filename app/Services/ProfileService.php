@@ -2,18 +2,48 @@
 
 namespace App\Services;
 
+use App\Enums\TransactionTypes;
 use App\Models\Client;
 use App\Models\Inventory;
 use App\Models\Item;
+use App\Models\Transaction;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class ProfileService
 {
-    public function get_inventory(Client $client): array
+    public function get_inventory(Client $client): Collection
     {
         return $client
             ->hasManyThrough(Item::class, Inventory::class,
                 'client_id', 'id', 'id', 'item_id')
             ->getResults();
+    }
+
+    public function try_accrue(Client $client, int $amount): bool
+    {
+        try
+        {
+            DB::transaction(function () use ($client, $amount)
+            {
+                $client->increment('balance', $amount);
+
+                $transaction = Transaction::create([
+                    'type' => TransactionTypes::Daily,
+                    'client_id' => $client->id,
+                    'accrual' => $amount
+                ]);
+
+                $client->update(['last_accrual' => $transaction->created_at]);
+            });
+
+            return true;
+        }
+        catch (Throwable $exception)
+        {
+            return false;
+        }
     }
 
     public function DecreaseBalance(Client $client, int $count): bool

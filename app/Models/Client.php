@@ -36,7 +36,8 @@ class Client extends Model implements \Illuminate\Contracts\Auth\Authenticatable
         'login',
         'email',
         'password',
-        'permission'
+        'permission',
+        'last_accrual'
     ];
 
     protected $hidden = [

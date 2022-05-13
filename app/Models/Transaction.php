@@ -27,6 +27,12 @@ class Transaction extends Model
 
     protected $table = "transactions";
 
+    protected $fillable = [
+        'type',
+        'client_id',
+        'accrual'
+    ];
+
     public function GetType() {
         return $this->hasOne(TransactionType::class, 'id', 'type')->get();
     }

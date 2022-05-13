@@ -71,12 +71,20 @@ class CaseApiController extends Controller
         return response(status: 400);
     }
 
-    public function buy(NBCase $case_id) {
+    public function buy(Request $request) {
+        if (!array_key_exists("case_id", $request->all())) {
+            return response(status: 400);
+        }
+        $case = NBCase::whereId($request["case_id"])->first();
+        if (!$case->exists()) {
+            return response(status: 400);
+        }
         $user = Auth::user();
-        if (!$this->clientService->DecreaseBalance($user->id, $case_id->price)) {
+
+        if (!$this->clientService->DecreaseBalance($user->id, $case->price)) {
             return "нету денег";
         }
-        $item = $this->service->OpenCase($case_id);
+        $item = $this->service->OpenCase($case);
         if ($item == null) {
             return response(status: 400);
         }

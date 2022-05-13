@@ -39,10 +39,12 @@ Route::middleware('auth:sanctum')->group(function ()
         });
     });
 
-    Route::get('/cases', [CaseApiController::class, "cases"]);
-    Route::get('/cases/{case_id}', [CaseApiController::class, "index"]);
-    Route::post('/cases/{case_id}/buy', [CaseApiController::class, 'buy']);
-    Route::post('/cases', [CaseApiController::class, 'create']);
+    Route::prefix('cases')->group(function () {
+        Route::get('/', [CaseApiController::class, "cases"]);
+        Route::post('/', [CaseApiController::class, 'create']);
+        Route::get('/{case_id}', [CaseApiController::class, "index"]);
+        Route::post('/buy', [CaseApiController::class, 'buy']);
+    });
 
     Route::get('/transaction_types', [EnumApiController::class, "transaction_type"]);
     Route::get('/permissions', [EnumApiController::class, "permissions"]);

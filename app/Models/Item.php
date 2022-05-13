@@ -31,6 +31,10 @@ class Item extends Model
 
     protected $table = 'items';
 
+    protected $fillable = ["name", "description", "price", "quality", "picture"];
+
+    public $timestamps = false;
+
     public function getQuality() {
         return $this->hasOne(Quality::class, 'id', 'quality')->get();
     }

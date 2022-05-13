@@ -50,8 +50,11 @@ Route::middleware('auth:sanctum')->group(function ()
     Route::get('/permissions', [EnumApiController::class, "permissions"]);
     Route::get('/qualities', [EnumApiController::class, "qualities"]);
 
-    Route::get('/items', [ItemApiController::class, "items"]);
-    Route::get('/items/{item_id}', [ItemApiController::class, "index"]);
+    Route::prefix('items')->group(function () {
+        Route::get('/', [ItemApiController::class, "items"]);
+        Route::post('/', [ItemApiController::class, "create"])->middleware("moderator");
+        Route::get('/{item_id}', [ItemApiController::class, "index"]);
+    });
 
     Route::get('/transactions', [TransactionApiController::class, "transactions"]);
     Route::get('/transactions/{transaction_id}', [TransactionApiController::class, "index"]);

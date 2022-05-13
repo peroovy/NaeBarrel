@@ -11,14 +11,16 @@ class AuthorizationService
 {
     public static string $TOKEN_NAME = 'token';
 
-    public function is_user_exist(string $login, string $email): bool
+    public function is_user_exists(string $login, string $email): bool
     {
-        return Client::where([['login', '=', $login], ['email', '=', $email]])->exists();
+        return Client::where('login', '=', $login)
+            ->orWhere('email', '=', $email)
+            ->exists();
     }
 
     public function try_register_client(string $login, string $email, string $password, int $permission): bool
     {
-        if ($this->is_user_exist($login, $email))
+        if ($this->is_user_exists($login, $email))
             return false;
 
         Client::create([
@@ -37,9 +39,6 @@ class AuthorizationService
             return null;
 
         $user = Auth::user();
-
-        if ($user->tokens()->exists())
-            return null;
 
         return $user->createToken(self::$TOKEN_NAME)->plainTextToken;
     }

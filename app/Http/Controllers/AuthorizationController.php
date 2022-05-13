@@ -32,7 +32,7 @@ class AuthorizationController extends Controller
         $is_registered = $this->authorizationService->try_register_client(
             $request['login'], $request['email'], $request['password'], $request['permission']);
 
-        return response(status: $is_registered ? 200 : 400);
+        return response(status: $is_registered ? 200 : 406);
     }
 
     public function login(Request $request)
@@ -47,7 +47,7 @@ class AuthorizationController extends Controller
 
         $token = $this->authorizationService->authorize($request['email'], $request['password']);
 
-        return $token ? response(['token' => $token]) : response(status: 400);
+        return $token ? response(['token' => $token]) : response(status: 401);
     }
 
     public function logout(Request $request)

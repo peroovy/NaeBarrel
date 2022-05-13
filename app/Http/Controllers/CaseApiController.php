@@ -8,7 +8,8 @@ use App\Models\Client;
 use App\Models\Item;
 use App\Models\NBCase;
 use App\Services\CaseService;
-use App\Services\ClientService;
+use App\Services\ClientsService;
+use App\Services\ProfileService;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,12 +18,12 @@ use Illuminate\Support\Facades\Validator;
 class CaseApiController extends Controller
 {
     private CaseService $service;
-    private ClientService $clientService;
+    private ProfileService $profileService;
 
-    public function __construct(CaseService $service, ClientService $clientService)
+    public function __construct(CaseService $service, ProfileService $profileService)
     {
         $this->service = $service;
-        $this->clientService = $clientService;
+        $this->profileService = $profileService;
     }
 
     public function cases() {
@@ -79,16 +80,17 @@ class CaseApiController extends Controller
         if (!$case->exists()) {
             return response(status: 400);
         }
+
         $user = Auth::user();
 
-        if (!$this->clientService->DecreaseBalance($user->id, $case->price)) {
+        if (!$this->profileService->DecreaseBalance($user, $case->price)) {
             return "нету денег";
         }
         $item = $this->service->OpenCase($case);
         if ($item == null) {
             return response(status: 400);
         }
-        $this->clientService->AddItem($user->id, $item["id"]);
+        $this->profileService->AddItem($user, $item["id"]);
         return new ItemResource($item);
     }
 }

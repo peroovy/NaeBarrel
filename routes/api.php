@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthorizationController;
 use App\Http\Controllers\CaseApiController;
 use App\Http\Controllers\EnumApiController;
 use App\Http\Controllers\ItemApiController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StoreController;
 use App\Http\Controllers\TransactionApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -60,4 +62,8 @@ Route::middleware('auth:sanctum')->group(function ()
     Route::get('/transactions', [TransactionApiController::class, "transactions"]);
     Route::get('/transactions/{transaction_id}', [TransactionApiController::class, "index"]);
 
+    Route::prefix('profile')->group(function ()
+    {
+        Route::get('/inventory', [ProfileController::class, 'inventory']);
+    });
 });

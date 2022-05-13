@@ -5,36 +5,19 @@ namespace App\Services;
 use App\Models\Client;
 use App\Models\Inventory;
 use App\Models\Item;
-use \Illuminate\Database\Eloquent\Collection;
 
-class ClientService
+class ProfileService
 {
-    public function get_clients(): Collection
+    public function get_inventory(Client $client): array
     {
-        return Client::all();
-    }
-
-    public function get_client_by_identifier(string|int $identifier): Client
-    {
-        $filter_field = is_numeric($identifier) ? 'clients.id' : 'clients.login';
-
-        return Client::where($filter_field, '=', $identifier)
-            ->firstOrFail();
-    }
-
-    public function get_inventory(string|int $identifier): Collection
-    {
-        $client = $this->get_client_by_identifier($identifier);
-
         return $client
             ->hasManyThrough(Item::class, Inventory::class,
                 'client_id', 'id', 'id', 'item_id')
             ->getResults();
     }
 
-    public function DecreaseBalance(string|int $identifier, int $count): bool
+    public function DecreaseBalance(Client $client, int $count): bool
     {
-        $client = $this->get_client_by_identifier($identifier);
         if ($client->balance < $count) {
             return false;
         }
@@ -42,23 +25,20 @@ class ClientService
         return true;
     }
 
-    public function IncreaseBalance(string|int $identifier, int $count): bool
+    public function IncreaseBalance(Client $client, int $count): bool
     {
-        $client = $this->get_client_by_identifier($identifier);
         $client->increment("balance", $count);
         return true;
     }
 
-    public function AddItem(string|int $identifier, int $item_id) {
-        $client = $this->get_client_by_identifier($identifier);
+    public function AddItem(Client $client, int $item_id) {
         Inventory::create([
             "client_id" => $client->id,
             "item_id" => $item_id
         ]);
     }
 
-    public function SellItems(string|int $identifier, array $ids) {
-        $client = $this->get_client_by_identifier($identifier);
+    public function SellItems(Client $client, array $ids) {
         $to_delete = Inventory::where([["client_id", "=", $client->id]])
             ->whereIn("item_id", $ids);
         $coins = 0;
@@ -74,7 +54,7 @@ class ClientService
             $coins += Item::whereId($item)->first()->price * $items_count[$item];
         }
         $to_delete->delete();
-        $this->IncreaseBalance($identifier, $coins);
+        $this->IncreaseBalance($client, $coins);
         return $coins;
     }
 }

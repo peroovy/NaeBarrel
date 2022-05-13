@@ -7,15 +7,15 @@ use App\Http\Resources\InventoryResource;
 use App\Http\Resources\ItemResource;
 use App\Services\FilterService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use App\Services\ClientService;
+use App\Services\ClientsService;
 use Illuminate\Http\Request;
 
 class ClientsController extends Controller
 {
-    private ClientService $clientService;
+    private ClientsService $clientService;
     private FilterService $filterService;
 
-    public function __construct(ClientService $clientService, FilterService $filterService)
+    public function __construct(ClientsService $clientService, FilterService $filterService)
     {
         $this->clientService = $clientService;
         $this->filterService = $filterService;

@@ -6,8 +6,9 @@ use App\Http\Resources\ItemResource;
 use App\Models\Inventory;
 use App\Models\Item;
 use App\Models\Quality;
-use App\Services\ClientService;
+use App\Services\ClientsService;
 use App\Services\ItemService;
+use App\Services\ProfileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -15,11 +16,12 @@ use Illuminate\Support\Facades\Validator;
 class ItemApiController extends Controller
 {
     private ItemService $service;
-    private ClientService $clientService;
-    public function __construct(ItemService $service, ClientService $clientService)
+    private ProfileService $profileService;
+
+    public function __construct(ItemService $service, ProfileService $profileService)
     {
         $this->service = $service;
-        $this->clientService = $clientService;
+        $this->profileService = $profileService;
     }
 
     public function items() {
@@ -58,7 +60,7 @@ class ItemApiController extends Controller
         if (!array_key_exists("item_ids", $request->all())) {
             return response(status: 400);
         }
-        $profit = $this->clientService->SellItems(Auth::user()->id, $request["item_ids"]);
+        $profit = $this->profileService->SellItems(Auth::user(), $request["item_ids"]);
 
         return $profit;
     }

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Http\Resources\ItemResource;
 use App\Models\CaseItem;
 use App\Models\Client;
+use App\Models\Item;
 use App\Models\NBCase;
 
 class CaseService
@@ -46,7 +47,7 @@ class CaseService
         $curr = 0.0;
         foreach ($items as $item) {
             $curr += $item["chance"];
-            if ($winning <= $curr) {
+            if ($curr >= $winning) {
                 return $item;
             }
         }

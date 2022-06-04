@@ -7,6 +7,6 @@ use BenSampo\Enum\Enum;
 
 final class Qualities extends Enum
 {
-    const Common = 0;
-    const Uncommon = 1;
+    const Common = 1;
+    const Uncommon = 2;
 }

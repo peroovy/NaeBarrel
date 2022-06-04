@@ -63,3 +63,12 @@ switch_on:
 
 switch_off:
 	php artisan down ${o}
+
+unit:
+	php artisan make:test ${n} --unit
+
+feature:
+	php artisan make:test ${n}
+
+test:
+	php artisan test

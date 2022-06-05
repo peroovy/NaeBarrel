@@ -197,11 +197,11 @@ class ProfileServiceTest extends TestCase
         $actual = $this->client->refresh();
         $this->assertEquals($this->balance + $expected_coins, $actual->balance);
 
-        $transaction = Transaction::where("client_id", "=", $this->client->id)
+        $this->assertTrue(Transaction::where("client_id", "=", $this->client->id)
             ->where("accrual", "=", $expected_coins)
-            ->firstWhere("type", "=", TransactionTypes::Sale);
-
-        $this->assertNotNull($transaction);
+            ->where("type", "=", TransactionTypes::Sale)
+            ->exists()
+        );
     }
 
     public function get_common_and_uncommon_counts(): array

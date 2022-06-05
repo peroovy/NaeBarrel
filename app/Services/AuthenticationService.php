@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\PersonalAccessToken;
 
-class AuthorizationService
+
+class AuthenticationService
 {
     public static string $TOKEN_NAME = 'token';
 
@@ -18,7 +19,7 @@ class AuthorizationService
             ->exists();
     }
 
-    public function try_register_client(string $login, string $email, string $password, int $permission): bool
+    public function try_register(string $login, string $email, string $password, int $permission): bool
     {
         if ($this->is_user_exists($login, $email))
             return false;
@@ -33,7 +34,7 @@ class AuthorizationService
         return true;
     }
 
-    public function authorize(string $email, string $password): string | null
+    public function authenticate(string $email, string $password): string | null
     {
         if (!Auth::attempt(['email' => $email, 'password' => $password]))
             return null;

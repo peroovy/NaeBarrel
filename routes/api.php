@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\AuthorizationController;
+use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\CaseApiController;
 use App\Http\Controllers\EnumApiController;
 use App\Http\Controllers\ItemApiController;
@@ -24,9 +24,9 @@ use \App\Http\Controllers\ClientsController;
 */
 Route::prefix('auth')->group(function ()
 {
-    Route::post('register', [AuthorizationController::class, 'register']);
-    Route::post('login', [AuthorizationController::class, 'login']);
-    Route::post('logout', [AuthorizationController::class, 'logout']);
+    Route::post('register', [AuthenticationController::class, 'register']);
+    Route::post('login', [AuthenticationController::class, 'login']);
+    Route::post('logout', [AuthenticationController::class, 'logout']);
 });
 
 Route::middleware('auth:sanctum')->group(function ()

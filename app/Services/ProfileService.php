@@ -13,16 +13,11 @@ use Throwable;
 
 class ProfileService
 {
-    public function get_inventory(Client $client): Collection
-    {
-        return $client
-            ->hasManyThrough(Item::class, Inventory::class,
-                'client_id', 'id', 'id', 'item_id')
-            ->getResults();
-    }
-
     public function try_accrue(Client $client, int $amount): bool
     {
+        if ($amount <= 0)
+            return false;
+
         try
         {
             DB::transaction(function () use ($client, $amount)
@@ -48,16 +43,21 @@ class ProfileService
 
     public function DecreaseBalance(Client $client, int $count): bool
     {
-        if ($client->balance < $count) {
+        if ($count <= 0 || $client->balance < $count)
             return false;
-        }
+
         $client->decrement("balance", $count);
+
         return true;
     }
 
     public function IncreaseBalance(Client $client, int $count): bool
     {
+        if ($count <= 0)
+            return false;
+
         $client->increment("balance", $count);
+
         return true;
     }
 
@@ -68,7 +68,8 @@ class ProfileService
         ]);
     }
 
-    public function SellItems(Client $client, array $ids) {
+    public function SellItems(Client $client, array $ids): int
+    {
         $to_delete = Inventory::where([["client_id", "=", $client->id]])
             ->whereIn("item_id", $ids);
         $coins = 0;
@@ -83,8 +84,27 @@ class ProfileService
         foreach (array_keys($items_count) as $item) {
             $coins += Item::whereId($item)->first()->price * $items_count[$item];
         }
-        $to_delete->delete();
-        $this->IncreaseBalance($client, $coins);
-        return $coins;
+
+        try
+        {
+            DB::transaction(function () use ($to_delete, $client, $coins)
+            {
+                $to_delete->delete();
+
+                Transaction::insert([
+                    "client_id" => $client->id,
+                    "type" => TransactionTypes::Sale,
+                    "accrual" => $coins
+                ]);
+
+                $this->IncreaseBalance($client, $coins);
+            });
+
+            return $coins;
+        }
+        catch (Throwable $exception)
+        {
+            return 0;
+        }
     }
 }

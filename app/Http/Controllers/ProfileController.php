@@ -6,6 +6,7 @@ use App\Enums\Permissions;
 use App\Http\Resources\ClientResource;
 use App\Http\Resources\ItemResource;
 use App\Http\Resources\TransactionResource;
+use App\Services\ClientsService;
 use App\Services\ProfileService;
 use BenSampo\Enum\Rules\EnumValue;
 use Illuminate\Http\Request;
@@ -15,7 +16,13 @@ use Illuminate\Support\Facades\Validator;
 
 class ProfileController extends Controller
 {
-    public function __construct(private ProfileService $profileService) {}
+    public function __construct(
+        private ProfileService $profileService,
+        private ClientsService $clientsService
+    )
+    {
+
+    }
 
     public function profile(): ClientResource
     {
@@ -24,7 +31,7 @@ class ProfileController extends Controller
 
     public function inventory(): AnonymousResourceCollection
     {
-        $items = $this->profileService->get_inventory(Auth::user());
+        $items = $this->clientsService->get_inventory(Auth::user()->id);
 
         return ItemResource::collection($items);
     }

@@ -29,7 +29,8 @@ class ClientService
         return $client
             ->hasManyThrough(Item::class, Inventory::class,
                 'client_id', 'id', 'id', 'item_id')
-            ->getResults();
+            ->select('items.*', 'inventories.id as inventory_id')
+            ->get();
     }
 
     public function DecreaseBalance(string|int $identifier, int $count): bool
@@ -58,9 +59,7 @@ class ClientService
     }
 
     public function SellItems(string|int $identifier, array $ids) {
-        $client = $this->get_client_by_identifier($identifier);
-        $to_delete = Inventory::where([["client_id", "=", $client->id]])
-            ->whereIn("item_id", $ids);
+        $to_delete = Inventory::whereIn("id", $ids);
         $coins = 0;
         $items_count = [];
         foreach ($to_delete->get() as $slot) {

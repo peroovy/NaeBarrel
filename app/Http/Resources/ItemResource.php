@@ -25,6 +25,9 @@ class ItemResource extends JsonResource
         if ($this->chance != null) {
             $item['chance'] = $this->chance;
         }
+        if ($this->inventory_id != null) {
+            $item['inventory_id'] = $this->inventory_id;
+        }
         return $item;
     }
 }

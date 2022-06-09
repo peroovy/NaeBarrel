@@ -20,9 +20,9 @@ class AuthenticationController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'login' => ['required'],
+            'login' => ['required', 'string'],
             'email' => ['required', 'email'],
-            'password' => ['required'],
+            'password' => ['required', 'string'],
             'permission' => ['required', new EnumValue(Permissions::class)],
         ]);
 
@@ -32,14 +32,14 @@ class AuthenticationController extends Controller
         $is_registered = $this->authenticationService->try_register(
             $request['login'], $request['email'], $request['password'], $request['permission']);
 
-        return response(status: $is_registered ? 200 : 406);
+        return response(status: $is_registered ? 200 : 422);
     }
 
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'email' => ['required', 'email'],
-            'password' => ['required'],
+            'password' => ['required', 'string'],
         ]);
 
         if ($validator->fails())

@@ -19,7 +19,7 @@ class ModeratorCheck
     {
         $user = \Auth::user();
         if (!$user || ($user->permission != Permissions::Moderator && $user->permission != Permissions::Admin)) {
-            return response(status: 406);
+            return response(status: 403);
         }
         return $next($request);
     }

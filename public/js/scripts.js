@@ -2,8 +2,11 @@ let shopList = document.querySelector('.shop-list');
 
 const nameMaxChars = 12;
 
-fetch("/api/cases/", {
-    method: 'GET'
+fetch("/api/cases", {
+    method: 'GET',
+    headers: {
+        'Authorization': localStorage.getItem("loginToken")
+    }
 }).then(response => {
     return response.json();
 }).then(data => {

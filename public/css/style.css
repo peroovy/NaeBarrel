@@ -231,12 +231,12 @@ body {
 }
 
 .actually-drop-name {
-    width: 20vh;
+    width: 35vh;
     text-align: center;
     position: absolute;
-    font-size: 3vh;
-    margin-top: 4vh;
-    margin-left: -8vh;
+    font-size: 6vh;
+    margin-top: 0vh;
+    margin-left: 0;
 }
 
 .drop-list {

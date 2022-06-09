@@ -13,7 +13,8 @@ function openBarrel(){
     fetch("/api/cases/buy", {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': localStorage.getItem("loginToken")
         },
         body: post
     }).then(response => {
@@ -47,7 +48,10 @@ let rarity = {
 };
 
 fetch("/api/cases/" + barrelId, {
-    method: 'GET'
+    method: 'GET',
+    headers: {
+        'Authorization': 'Bearer 3|mb6CISL1AolVJ5NUbHSQYRM2jhJLGsXdgrL4HhJN'
+    }
 }).then(response => {
     return response.json();
 }).then(data => {

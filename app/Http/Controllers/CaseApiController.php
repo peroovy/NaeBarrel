@@ -82,7 +82,7 @@ class CaseApiController extends Controller
         $user = Auth::user();
 
         if (!$this->clientService->DecreaseBalance($user->id, $case->price)) {
-            return "нету денег";
+            return ["error_status" => "NotEnoughMoney"];
         }
         $item = $this->service->OpenCase($case);
         if ($item == null) {

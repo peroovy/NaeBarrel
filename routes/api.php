@@ -27,8 +27,21 @@ Route::prefix('auth')->group(function ()
     Route::post('logout', [AuthorizationController::class, 'logout']);
 });
 
+//auth
+
+
+
+//auth
+
 Route::middleware('auth:sanctum')->group(function ()
 {
+    Route::prefix('cases')->group(function () {
+        Route::get('/', [CaseApiController::class, "cases"])->name("all_cases");
+        Route::post('/', [CaseApiController::class, 'create'])->middleware("moderator");
+        Route::get('/{case_id}', [CaseApiController::class, "index"]);
+        Route::post('/buy', [CaseApiController::class, 'buy']);
+    });
+
     Route::prefix('clients')->group(function ()
     {
         Route::get('/', [ClientsController::class, 'all']);
@@ -37,13 +50,6 @@ Route::middleware('auth:sanctum')->group(function ()
             Route::get('/', [ClientsController::class, 'client']);
             Route::get('/inventory', [ClientsController::class, 'inventory']);
         });
-    });
-
-    Route::prefix('cases')->group(function () {
-        Route::get('/', [CaseApiController::class, "cases"]);
-        Route::post('/', [CaseApiController::class, 'create'])->middleware("moderator");
-        Route::get('/{case_id}', [CaseApiController::class, "index"]);
-        Route::post('/buy', [CaseApiController::class, 'buy']);
     });
 
     Route::get('/transaction_types', [EnumApiController::class, "transaction_type"]);

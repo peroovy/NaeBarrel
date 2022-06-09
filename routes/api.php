@@ -1,9 +1,11 @@
 <?php
 
-use App\Http\Controllers\AuthorizationController;
+use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\CaseApiController;
 use App\Http\Controllers\EnumApiController;
 use App\Http\Controllers\ItemApiController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StoreController;
 use App\Http\Controllers\TransactionApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,9 +24,9 @@ use \App\Http\Controllers\ClientsController;
 */
 Route::prefix('auth')->group(function ()
 {
-    Route::post('register', [AuthorizationController::class, 'register']);
-    Route::post('login', [AuthorizationController::class, 'login']);
-    Route::post('logout', [AuthorizationController::class, 'logout']);
+    Route::post('register', [AuthenticationController::class, 'register']);
+    Route::post('login', [AuthenticationController::class, 'login']);
+    Route::post('logout', [AuthenticationController::class, 'logout']);
 });
 
 //auth
@@ -66,4 +68,10 @@ Route::middleware('auth:sanctum')->group(function ()
     Route::get('/transactions', [TransactionApiController::class, "transactions"]);
     Route::get('/transactions/{transaction_id}', [TransactionApiController::class, "index"]);
 
+    Route::prefix('profile')->group(function ()
+    {
+        Route::get('', [ProfileController::class, 'profile']);
+        Route::get('/inventory', [ProfileController::class, 'inventory']);
+        Route::post('/accrue', [ProfileController::class, 'accrue']);
+    });
 });

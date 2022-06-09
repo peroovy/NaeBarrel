@@ -13,13 +13,13 @@ class ItemService
         return $filter->GetFiltered(Item::all(), 'quality', 'quality');
     }
 
-    public function ItemExists(string $name) {
+    public function ItemExists(string $name): bool {
         return Item::whereName($name)->exists();
     }
 
-    public function CreateItem(string $name, string $description, string $price, int $quality, string $picture) {
+    public function CreateItem(string $name, string $description, string $price, int $quality, string $picture): Item | null {
         if ($this->ItemExists($name)) {
-            return false;
+            return null;
         }
         return Item::create([
             "name" => $name,

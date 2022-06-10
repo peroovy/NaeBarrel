@@ -69,7 +69,7 @@ class CaseService
         DB::beginTransaction();
         try
         {
-            if (!$this->profileService->decreaseBalance($user->id, $case->price, TransactionTypes::CaseBuying)
+            if (!$this->profileService->decreaseBalance($user->id, $case->price)
                 || !($item = $this->openCase($case)))
             {
                 throw new Exception();
@@ -113,6 +113,7 @@ class CaseService
                 return $item;
             }
         }
+
         return $items->last();
     }
 }

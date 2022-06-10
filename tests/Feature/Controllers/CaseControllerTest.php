@@ -118,7 +118,7 @@ class CaseControllerTest extends TestCase
         $response->assertJson(function (AssertableJson $json)
         {
             return $json->has(2)
-                ->first(fn (AssertableJson $json) => $this->assert_case($json));
+                ->first(fn (AssertableJson $json) => $this->assert_case_with_items($json));
         });
     }
 
@@ -129,7 +129,7 @@ class CaseControllerTest extends TestCase
         $response = $this->get("api/cases/" . $this->case->id, $this->client_headers);
 
         $response->assertOk();
-        $response->assertJson(fn (AssertableJson $json) => $this->assert_case($json));
+        $response->assertJson(fn (AssertableJson $json) => $this->assert_case_with_items($json));
     }
 
     /**
@@ -315,7 +315,8 @@ class CaseControllerTest extends TestCase
                     ->where("description", $this->item_in_case->description)
                     ->where("price", $this->item_in_case->price)
                     ->where("quality", $this->item_in_case->quality)
-                    ->where("picture", $this->item_in_case->picture);
+                    ->where("picture", $this->item_in_case->picture)
+                    ->has("chance");
             });
 
         $this->assertDatabaseHas(Client::class, ["login" => $this->client->login, "balance" => $expected_balance]);
@@ -325,7 +326,7 @@ class CaseControllerTest extends TestCase
         );
     }
 
-    private function assert_case(AssertableJson $json): AssertableJson|Matching
+    private function assert_case_with_items(AssertableJson $json): AssertableJson|Matching
     {
         return $json->where("id", $this->case->id)
             ->where("name", $this->case->name)
@@ -339,6 +340,7 @@ class CaseControllerTest extends TestCase
                 ->where("price", $this->item_in_case->price)
                 ->where("quality", $this->item_in_case->quality)
                 ->where("picture", $this->item_in_case->picture)
+                ->has("chance")
             );
     }
 }

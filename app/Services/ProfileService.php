@@ -13,6 +13,13 @@ use Throwable;
 
 class ProfileService
 {
+    private ClientsService $clientsService;
+
+    public function __construct(ClientsService $clientsService) {
+        $this->clientsService = $clientsService;
+    }
+
+
     public function try_accrue(Client $client, int $amount): bool
     {
         if ($amount <= 0)
@@ -41,37 +48,34 @@ class ProfileService
         }
     }
 
-    public function DecreaseBalance(Client $client, int $count): bool
+    public function DecreaseBalance(string|int $identifier, int $count): bool
     {
-        if ($count <= 0 || $client->balance < $count)
+        $client = $this->clientsService->get_client_by_identifier($identifier);
+        if ($client->balance < $count) {
             return false;
-
+        }
         $client->decrement("balance", $count);
-
         return true;
     }
 
-    public function IncreaseBalance(Client $client, int $count): bool
+    public function IncreaseBalance(string|int $identifier, int $count): bool
     {
-        if ($count <= 0)
-            return false;
-
+        $client = $this->clientsService->get_client_by_identifier($identifier);
         $client->increment("balance", $count);
-
         return true;
     }
 
-    public function AddItem(Client $client, int $item_id) {
+    public function AddItem(string|int $identifier, int $item_id) {
+        $client = $this->clientsService->get_client_by_identifier($identifier);
         Inventory::create([
             "client_id" => $client->id,
             "item_id" => $item_id
         ]);
     }
 
-    public function SellItems(Client $client, array $ids): int
-    {
-        $to_delete = Inventory::where([["client_id", "=", $client->id]])
-            ->whereIn("item_id", $ids);
+    public function SellItems(string|int $identifier, array $ids) {
+        $client = $this->clientsService->get_client_by_identifier($identifier);
+        $to_delete = Inventory::whereIn("id", $ids)->where([["client_id", "=", $client->id]]);
         $coins = 0;
         $items_count = [];
         foreach ($to_delete->get() as $slot) {
@@ -84,27 +88,8 @@ class ProfileService
         foreach (array_keys($items_count) as $item) {
             $coins += Item::whereId($item)->first()->price * $items_count[$item];
         }
-
-        try
-        {
-            DB::transaction(function () use ($to_delete, $client, $coins)
-            {
-                $to_delete->delete();
-
-                Transaction::insert([
-                    "client_id" => $client->id,
-                    "type" => TransactionTypes::Sale,
-                    "accrual" => $coins
-                ]);
-
-                $this->IncreaseBalance($client, $coins);
-            });
-
-            return $coins;
-        }
-        catch (Throwable $exception)
-        {
-            return 0;
-        }
+        $to_delete->delete();
+        $this->IncreaseBalance($identifier, $coins);
+        return $coins;
     }
 }

@@ -32,7 +32,6 @@ Route::prefix('auth')->group(function ()
 
 Route::get('/market', [MarketApiController::class, 'all']);
 
-
 Route::prefix('clients')->group(function ()
 {
     Route::get('/', [ClientsController::class, 'all']);
@@ -49,7 +48,7 @@ Route::get('/cases/{case_id}', [CaseApiController::class, "index"]);
 Route::middleware('auth:sanctum')->group(function ()
 {
     Route::prefix('cases')->group(function () {
-        Route::post('/', [CaseApiController::class, 'create'])->middleware("moderator");
+        Route::post('', [CaseApiController::class, 'create'])->middleware("moderator");
         Route::post('/buy', [CaseApiController::class, 'buy']);
     });
 
@@ -58,8 +57,8 @@ Route::middleware('auth:sanctum')->group(function ()
     Route::get('/qualities', [EnumApiController::class, "qualities"]);
 
     Route::prefix('items')->group(function () {
-        Route::get('/', [ItemApiController::class, "items"]);
-        Route::post('/', [ItemApiController::class, "create"])->middleware("moderator");
+        Route::get('', [ItemApiController::class, "items"]);
+        Route::post('', [ItemApiController::class, "create"])->middleware("moderator");
         Route::get('/{item_id}', [ItemApiController::class, "index"]);
         Route::post('/sell', [ItemApiController::class, "sell"]);
     });
@@ -73,4 +72,6 @@ Route::middleware('auth:sanctum')->group(function ()
         Route::get('/inventory', [ProfileController::class, 'inventory']);
         Route::post('/accrue', [ProfileController::class, 'accrue']);
     });
+
+    Route::post('/market/createlot', [MarketApiController::class, 'putItem']);
 });

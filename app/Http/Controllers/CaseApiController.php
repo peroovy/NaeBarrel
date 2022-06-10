@@ -66,7 +66,7 @@ class CaseApiController extends Controller
 
     public function buy(Request $request) {
         $validator = Validator::make($request->all(), [
-           "case_id" => ["required", "integer"]
+           "case_id" => ["required", "numeric"]
         ]);
 
         if ($validator->fails())

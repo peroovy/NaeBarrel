@@ -31,7 +31,7 @@ class ProfileController extends Controller
     public function accrue(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'amount' => ['required', 'integer', 'min:1'],
+            'amount' => ['required', 'numeric', 'min:1'],
         ]);
 
         if ($validator->fails())

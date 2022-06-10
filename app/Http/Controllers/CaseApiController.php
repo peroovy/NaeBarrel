@@ -38,10 +38,10 @@ class CaseApiController extends Controller
         $validator = Validator::make($request->all(), [
             "name" => ["required", "string"],
             "description" => ["required", "string"],
-            "price" => ["required", "integer"],
+            "price" => ["required", "numeric"],
             "picture" => ["required"],
             "items" => ["sometimes", "array"],
-            "items.*.id" => ["required", "integer"],
+            "items.*.id" => ["required", "numeric"],
             "items.*.chance" => ["required", "numeric", "gt:0"],
         ]);
 

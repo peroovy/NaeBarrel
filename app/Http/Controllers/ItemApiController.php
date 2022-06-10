@@ -38,7 +38,7 @@ class ItemApiController extends Controller
         $validator = Validator::make($request->all(), [
             "name" => ["required", "string"],
             "description" => ["required", "string"],
-            "price" => ["required", "integer"],
+            "price" => ["required", "numeric"],
             "picture" => ["required"],
             "quality" => ["sometimes", new EnumValue(Qualities::class)]
         ]);
@@ -59,12 +59,16 @@ class ItemApiController extends Controller
     }
 
     public function sell(Request $request) {
-        if (!array_key_exists("item_ids", $request->all())) {
+        $validator = Validator::make($request->all(), [
+            "item_ids" => ["required", "array"],
+            "item_ids.*" => ["numeric"]
+        ]);
+
+        if ($validator->fails())
             return response(status: 400);
-        }
 
-        $profit = $this->profileService->sellItems(Auth::user()->id, $request["item_ids"]);
+        $coins = $this->profileService->sellItems(Auth::user()->id, $request["item_ids"]);
 
-        return $profit != null ? ["profit" => $profit] : response(status: 422);
+        return $coins != null ? ["coins" => $coins] : response(status: 422);
     }
 }

@@ -100,6 +100,9 @@ class ProfileService
             $coins += Item::whereId($item)->first()->price * $items_count[$item];
         }
 
+        if ($coins == 0)
+            return null;
+
         DB::beginTransaction();
         try
         {

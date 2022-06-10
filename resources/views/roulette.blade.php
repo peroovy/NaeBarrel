@@ -26,13 +26,13 @@
 
         </div>
     </div>
-    <div class="openedItem" id="openedItem"> <!--Сюда подгружаете дроп, который выпадет-->
+    <div class="openedItem hidden" id="openedItem"> <!--Сюда подгружаете дроп, который выпадет-->
       <div class="closeBarrel" id="closeBarrel" onclick="closeBarrel()">
         <p class="ok">OK</p>
       </div>
       <div class="actually-drop">
-          <img src="fish.png" class="actually-drop-size">
-          <p class="actually-drop-name">abrakadabra</p>
+          <img class="actually-drop-size">
+          <p class="actually-drop-name"></p>
       </div>
     </div>
     <script>

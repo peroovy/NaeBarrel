@@ -18,15 +18,15 @@ class MarketService
         $this->profileService = $profileService;
     }
 
-    public function putItem($identifier, $itemId, $price) {
-        $client = $this->clientsService->getClientByIdentifier($identifier);
-        $item = Inventory::where([["client_id", "=", $client->id], ["item_id", "=", $itemId]]);
+    public function putItem($identifier, $invId, $price) {
+        $client = $this->clientsService->get_client_by_identifier($identifier);
+        $item = Inventory::where([["client_id", "=", $client->id], ["id", "=", $invId]]);
         if (!$item->exists()) {
             return response(status: 400);
         }
-        $item = $item->first();
+        $params = $item->get()[0];
         $lot = Market::create([
-            "item_id" => $itemId,
+            "item_id" => $params['item_id'],
             "price" => $price,
             "client_id" => $client->id
         ]);

@@ -3,7 +3,7 @@ if (!barrelId) {
 }
 
 function openBarrel(){
-    document.getElementById("openedItem").style.display = "block";
+    document.getElementById("openedItem").classList.remove('hidden');
     document.getElementById("background").style.filter = "blur(5px)";
 
     let post = JSON.stringify({
@@ -41,13 +41,13 @@ function openBarrel(){
 }
 
 function closeBarrel(){
-    document.getElementById("openedItem").style.display = "none";
+    document.getElementById("openedItem").classList.add('hidden');
     document.getElementById("background").style.filter = "blur(0px)";
 }
 
 let rarity = {
-    3: 'drop',
-    4: 'drop-rare'
+    3: 'common',
+    4: 'rare'
 };
 
 fetch("/api/cases/" + barrelId, {
@@ -64,6 +64,7 @@ fetch("/api/cases/" + barrelId, {
     let dropList = document.querySelector('.drop-list');
     data['items'].forEach(item => {
         let drop = document.createElement('div');
+        drop.classList.add('drop');
         drop.classList.add(rarity[item['quality']]);
 
         let img = document.createElement('img');

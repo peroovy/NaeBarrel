@@ -100,7 +100,6 @@ body {
 .block {
     width: 20vh;
     height: auto;
-    background-color: #D29E3A;
     border-radius: 2.5vh;
     transition: 0.2s;
 }
@@ -186,9 +185,9 @@ body {
 }
 
 .openedItem {
+    display: block;
     position: absolute;
     top: 10vh;
-    display: none;
     width: 60vh;
     height: 60vh;
     border-radius: 50%;
@@ -255,29 +254,23 @@ body {
 .drop {
     width: 20vh;
     height: auto;
+    border-radius: 2.5vh;
+}
+
+.common {
     background-color: #D29E3A;
-    border-radius: 2.5vh;
 }
 
-.drop-rare {
-    width: 20vh;
-    height: auto;
+.rare {
     background-color: #99A68C;
-    border-radius: 2.5vh;
 }
 
-.drop-superrare {
-    width: 20vh;
-    height: auto;
+.superrare {
     background-color: #F47A33;
-    border-radius: 2.5vh;
 }
 
-.drop-rarest {
-    width: 20vh;
-    height: auto;
+.rarest {
     background-color: #FFC700;
-    border-radius: 2.5vh;
 }
 
 .drop-name {
@@ -354,4 +347,56 @@ body {
 .choose-size {
     width: 20vh;
     height: auto;
+}
+
+.sell-btn {
+    border-radius: 50%;
+    background-color: #69e869;
+    width: 25vh;
+    height: 25vh;
+    position: absolute;
+    top: 40vh;
+    left: -10vh;
+    transition: 0.2s;
+}
+
+.sell-btn:hover {
+    transform: scale(1.2);
+}
+
+.market-btn {
+    border-radius: 50%;
+    background-color: #face82;
+    width: 25vh;
+    height: 25vh;
+    position: absolute;
+    top: 40vh;
+    left: 45vh;
+    transition: 0.2s;
+}
+
+.market-btn:hover {
+    transform: scale(1.2);
+}
+
+.market-field {
+    border-radius: 10%;
+    background-color: #ffe6c4;
+    outline: none;
+    border: 0 solid #af8f5a;
+    width: 12.5vh;
+    height: 6vh;
+    position: absolute;
+    top: 47vh;
+    left: 51vh;
+    font-size: 5vh;
+    transition: 0.2s;
+}
+
+.market-field:hover {
+    transform: scale(1.2);
+}
+
+.hidden {
+    display: none;
 }

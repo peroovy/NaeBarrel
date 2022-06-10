@@ -46,8 +46,8 @@ function closeBarrel(){
 }
 
 let rarity = {
-    3: 'drop',
-    4: 'drop-rare'
+    3: 'common',
+    4: 'rare'
 };
 
 fetch("/api/cases/" + barrelId, {
@@ -64,6 +64,7 @@ fetch("/api/cases/" + barrelId, {
     let dropList = document.querySelector('.drop-list');
     data['items'].forEach(item => {
         let drop = document.createElement('div');
+        drop.classList.add('drop');
         drop.classList.add(rarity[item['quality']]);
 
         let img = document.createElement('img');

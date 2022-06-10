@@ -1,5 +1,10 @@
 let list = document.querySelector('.inv-list');
 
+let rarity = {
+    3: 'common',
+    4: 'rare'
+};
+
 fetch("/api/clients/" + clientLogin + "/inventory", {
     method: 'GET',
     headers: {
@@ -10,7 +15,8 @@ fetch("/api/clients/" + clientLogin + "/inventory", {
 }).then(data => {
     data.forEach(item => {
         let block = document.createElement('div');
-        block.classList.add('block')
+        block.classList.add('block');
+        block.classList.add(rarity[item['quality']]);
 
         let img = document.createElement('img');
         img.src = '../pic/fish.png';

@@ -100,7 +100,6 @@ body {
 .block {
     width: 20vh;
     height: auto;
-    background-color: #D29E3A;
     border-radius: 2.5vh;
     transition: 0.2s;
 }
@@ -255,29 +254,23 @@ body {
 .drop {
     width: 20vh;
     height: auto;
+    border-radius: 2.5vh;
+}
+
+.common {
     background-color: #D29E3A;
-    border-radius: 2.5vh;
 }
 
-.drop-rare {
-    width: 20vh;
-    height: auto;
+.rare {
     background-color: #99A68C;
-    border-radius: 2.5vh;
 }
 
-.drop-superrare {
-    width: 20vh;
-    height: auto;
+.superrare {
     background-color: #F47A33;
-    border-radius: 2.5vh;
 }
 
-.drop-rarest {
-    width: 20vh;
-    height: auto;
+.rarest {
     background-color: #FFC700;
-    border-radius: 2.5vh;
 }
 
 .drop-name {

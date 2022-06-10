@@ -32,6 +32,7 @@ class ClientsService
         return $client
             ?->hasManyThrough(Item::class, Inventory::class,
                 'client_id', 'id', 'id', 'item_id')
+            ->select('items.*', 'inventories.id as inv_id')
             ->getResults();
     }
 

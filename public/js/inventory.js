@@ -1,3 +1,38 @@
+function putOnMarket() {
+    let price = document.querySelector('.market-field').value;
+    if (price === null) {
+        return
+    }
+
+    let invId = document.querySelector('.openedItem').id;
+    let post = JSON.stringify({
+        "inventory_id": parseInt(invId),
+        "price": parseInt(price)
+    });
+    console.log(post);
+
+    fetch("/api/market/createlot", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': localStorage.getItem("loginToken")
+        },
+        body: post
+    }).then(response => {
+        console.log("done!")
+        return response.json();
+    }).then(data => {
+        console.log(data)
+    })
+}
+
+
+function closeItem() {
+    document.querySelector('.openedItem').classList.add('hidden');
+    document.querySelector('.background').style.filter = "blur(0px)";
+}
+
+
 let list = document.querySelector('.inv-list');
 
 let rarity = {
@@ -17,6 +52,14 @@ fetch("/api/clients/" + clientLogin + "/inventory", {
         let block = document.createElement('div');
         block.classList.add('block');
         block.classList.add(rarity[item['quality']]);
+        block.onclick = function () {
+            document.querySelector('.openedItem').classList.remove('hidden');
+            document.querySelector('.openedItem').id = item['inv_id'];
+            document.querySelector('.background').style.filter = "blur(5px)";
+
+            document.querySelector('.actually-drop-size').src = '../pic/fish.png';
+            document.querySelector('.actually-drop-name').textContent = item['name'];
+        };
 
         let img = document.createElement('img');
         img.src = '../pic/fish.png';
@@ -27,11 +70,6 @@ fetch("/api/clients/" + clientLogin + "/inventory", {
         name.textContent = item['name'];
         name.classList.add('iname');
         block.append(name);
-
-        let sell = document.createElement('p');
-        sell.textContent = "sell";
-        sell.classList.add('sell');
-        block.append(sell);
 
         let price = document.createElement('p');
         price.textContent = item['price'];

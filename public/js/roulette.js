@@ -3,7 +3,7 @@ if (!barrelId) {
 }
 
 function openBarrel(){
-    document.getElementById("openedItem").style.display = "block";
+    document.getElementById("openedItem").classList.remove('hidden');
     document.getElementById("background").style.filter = "blur(5px)";
 
     let post = JSON.stringify({
@@ -41,7 +41,7 @@ function openBarrel(){
 }
 
 function closeBarrel(){
-    document.getElementById("openedItem").style.display = "none";
+    document.getElementById("openedItem").classList.add('hidden');
     document.getElementById("background").style.filter = "blur(0px)";
 }
 

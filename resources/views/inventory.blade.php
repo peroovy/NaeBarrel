@@ -11,10 +11,26 @@
         <img src="{{URL::asset("../pic/NaeBarrelIcon.png")}}" class="icon">
         <div class="profile-balance"></div> <!--Сюда баланс-->
         <div class="profile"></div> <!--Сюда авы подгружайте-->
-        <div class="inv-list"> <!--Тут гуглите Repeat-нотацию для grid-->
-
-        </div>
+        <div class="inv-list"> <!--Тут гуглите Repeat-нотацию для grid--></div>
     </div>
+
+    <div class="openedItem hidden">
+        <div class="closeBarrel" onclick="closeItem()">
+            <p class="ok">OK</p>
+        </div>
+        <div class="actually-drop">
+            <img class="actually-drop-size">
+            <p class="actually-drop-name"></p>
+        </div>
+        <div class="sell-btn">
+            <p style="position: absolute; font-size: 5vh; top: 10vh; left: 5vh; margin: 0">продать</p>
+        </div>
+        <div class="market-btn" id="0" onclick="putOnMarket()">
+            <p style="position: absolute; font-size: 4vh; top: 15vh; left: 3vh; margin: 0">Выставить</p>
+        </div>
+        <input type="number" class="market-field">
+    </div>
+
     <script>
         let clientLogin = "{{$login}}";
         console.log(clientLogin);

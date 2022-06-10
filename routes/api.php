@@ -42,8 +42,8 @@ Route::middleware('auth:sanctum')->group(function ()
     });
 
     Route::prefix('cases')->group(function () {
-        Route::get('/', [CaseApiController::class, "cases"]);
-        Route::post('/', [CaseApiController::class, 'create'])->middleware("moderator");
+        Route::get('', [CaseApiController::class, "cases"]);
+        Route::post('', [CaseApiController::class, 'create'])->middleware("moderator");
         Route::get('/{case_id}', [CaseApiController::class, "index"]);
         Route::post('/buy', [CaseApiController::class, 'buy']);
     });

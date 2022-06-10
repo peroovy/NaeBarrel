@@ -36,11 +36,13 @@ class CaseApiController extends Controller
 
     public function create(Request $request) {
         $validator = Validator::make($request->all(), [
-            "name" => ["required"],
-            "description" => ["required"],
-            "price" => ["required"],
+            "name" => ["required", "string"],
+            "description" => ["required", "string"],
+            "price" => ["required", "integer"],
             "picture" => ["required"],
-            "items" => ["sometimes"]
+            "items" => ["sometimes", "array"],
+            "items.*.id" => ["required", "integer"],
+            "items.*.chance" => ["required", "numeric", "gt:0"],
         ]);
 
         if ($validator->fails()) {
@@ -49,15 +51,8 @@ class CaseApiController extends Controller
 
         $withItems = array_key_exists("items", $request->all());
 
-
-        if ($withItems) {
-            $item_ids = array_keys($request["items"]);
-            $items = Item::findMany($item_ids);
-            if (count($items) != count($item_ids) ||
-                array_sum($request["items"]) != 1) {
-                return response(status: 400);
-            }
-        }
+        if ($withItems && !$this->service->ValidateItems($request["items"]))
+            return response(status: 422);
 
         $case = $this->service->CreateCase(
             $request["name"],
@@ -66,10 +61,7 @@ class CaseApiController extends Controller
             $request["picture"],
             $withItems ? $request["items"] : []);
 
-        if ($case) {
-            return new CaseResource($case);
-        }
-        return response(status: 400);
+        return $case ? new CaseResource($case) : response(status: 400);
     }
 
     public function buy(Request $request) {

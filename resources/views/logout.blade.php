@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<button class="submit" onclick="logout()"></button>
+<button class="submit" onclick="logout()" style="width: 12vh; height: 3vh">Выйти</button>
 
 <script src="{{URL::asset('js/logout.js')}}"></script>
 </body>

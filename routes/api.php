@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\CaseApiController;
 use App\Http\Controllers\EnumApiController;
 use App\Http\Controllers\ItemApiController;
+use App\Http\Controllers\MarketApiController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\TransactionApiController;
@@ -28,6 +29,8 @@ Route::prefix('auth')->group(function ()
     Route::post('login', [AuthenticationController::class, 'login']);
     Route::post('logout', [AuthenticationController::class, 'logout']);
 });
+
+Route::get('/market', [MarketApiController::class, 'all']);
 
 
 Route::prefix('clients')->group(function ()

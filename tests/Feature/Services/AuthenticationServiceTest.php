@@ -37,25 +37,25 @@ class AuthenticationServiceTest extends TestCase
 
     public function test_existing_user_by_login_and_email()
     {
-        $this->assertFalse($this->service->is_user_exists("unknown", "unknown"));
+        $this->assertFalse($this->service->isUserExists("unknown", "unknown"));
 
-        $this->assertTrue($this->service->is_user_exists($this->client->login, "unknown"));
-        $this->assertTrue($this->service->is_user_exists("unknown", $this->client->email));
-        $this->assertTrue($this->service->is_user_exists($this->client->login, $this->client->email));
+        $this->assertTrue($this->service->isUserExists($this->client->login, "unknown"));
+        $this->assertTrue($this->service->isUserExists("unknown", $this->client->email));
+        $this->assertTrue($this->service->isUserExists($this->client->login, $this->client->email));
     }
 
     public function test_registration__login_or_email_already_exist()
     {
         $this->assertFalse(
-            $this->service->try_register($this->client->login, "", "", -1)
+            $this->service->tryRegister($this->client->login, "", "", -1)
         );
 
         $this->assertFalse(
-            $this->service->try_register("unknown", $this->client->email, "", -1)
+            $this->service->tryRegister("unknown", $this->client->email, "", -1)
         );
 
         $this->assertFalse(
-            $this->service->try_register($this->client->login, $this->client->email, "", -1)
+            $this->service->tryRegister($this->client->login, $this->client->email, "", -1)
         );
     }
 
@@ -68,7 +68,7 @@ class AuthenticationServiceTest extends TestCase
             "permission" => Permissions::User
         ];
 
-        $this->assertTrue($this->service->try_register(...$expected));
+        $this->assertTrue($this->service->tryRegister(...$expected));
 
         $actual = Client::where("login", "=", $expected["login"])
             ->where("email", "=", $expected["email"])
@@ -88,8 +88,8 @@ class AuthenticationServiceTest extends TestCase
     public function test_logout()
     {
         $token = $this->service->authenticate($this->client->email, $this->client_password);
-        $this->assertTrue($this->service->try_logout($token));
+        $this->assertTrue($this->service->tryLogout($token));
 
-        $this->assertFalse($this->service->try_logout($token));
+        $this->assertFalse($this->service->tryLogout($token));
     }
 }

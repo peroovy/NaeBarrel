@@ -76,7 +76,7 @@ class CaseApiController extends Controller
         if (!$case)
             return response(status: 404);
 
-        $item = $this->caseService->tryOpenCase(
+        $item = $this->caseService->tryPlayRoulette(
             user: Auth::user(),
             case: $case
         );

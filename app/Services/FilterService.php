@@ -8,7 +8,7 @@ use phpDocumentor\Reflection\Types\Integer;
 
 class FilterService
 {
-    public function GetFiltered(Collection $collection, string $filterName, string $columnName): Collection
+    public function getFiltered(Collection $collection, string $filterName, string $columnName): Collection
     {
         if (key_exists($filterName, $_GET)) {
             return $collection->where($columnName, '=', $_GET[$filterName]);
@@ -16,10 +16,10 @@ class FilterService
         return $collection;
     }
 
-    public function ManyFilters(Collection $collection, array $filters): Collection
+    public function manyFilters(Collection $collection, array $filters): Collection
     {
         foreach ($filters as $filterName => $columnName) {
-            $collection = $this->GetFiltered($collection, $filterName, $columnName);
+            $collection = $this->getFiltered($collection, $filterName, $columnName);
         }
         return $collection;
     }

@@ -47,7 +47,7 @@ class ItemServiceTest extends TestCase
 
     public function test_getting_all()
     {
-        $actual = $this->service->GetAll();
+        $actual = $this->service->get();
 
         $this->assertEquals(Item::all(), $actual);
     }
@@ -57,7 +57,7 @@ class ItemServiceTest extends TestCase
         foreach ([Qualities::Common => $this->common, Qualities::Uncommon => $this->uncommon] as $value => $obj)
         {
             $_GET["quality"] = $value;
-            $actual = $this->service->GetAll()->values();
+            $actual = $this->service->get()->values();
             $this->assertCount(1, $actual);
             $this->assertEquals($obj["id"], $actual[0]["id"]);
         }
@@ -66,14 +66,14 @@ class ItemServiceTest extends TestCase
     public function test_getting_all__bad_filtering()
     {
         $_GET["quality"] = -1;
-        $this->assertCount(0, $this->service->GetAll());
+        $this->assertCount(0, $this->service->get());
     }
 
     public function test_existing_item()
     {
-        $this->assertTrue($this->service->ItemExists($this->common->name));
-        $this->assertTrue($this->service->ItemExists($this->uncommon->name));
-        $this->assertFalse($this->service->ItemExists("unknown"));
+        $this->assertTrue($this->service->exists($this->common->name));
+        $this->assertTrue($this->service->exists($this->uncommon->name));
+        $this->assertFalse($this->service->exists("unknown"));
     }
 
     public function test_creating_item()
@@ -86,7 +86,7 @@ class ItemServiceTest extends TestCase
             "picture" => "123.jpg"
         ]);
 
-        $actual = $this->service->CreateItem(...$item->getAttributes());
+        $actual = $this->service->create(...$item->getAttributes());
 
         $this->assertInstanceOf(Item::class, $actual);
         $this->assertEquals($item->description, $actual->description);
@@ -100,6 +100,6 @@ class ItemServiceTest extends TestCase
     {
         $attr = $this->common->getAttributes();
         unset($attr["id"]);
-        $this->assertNull($this->service->CreateItem(...$attr));
+        $this->assertNull($this->service->create(...$attr));
     }
 }

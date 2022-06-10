@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class TransactionService
 {
-    public function GetAll(): Collection {
+    public function getAll(): Collection {
         $filter = new FilterService();
-        return $filter->ManyFilters(Transaction::orderBy("updated_at", "DESC")->get(), [
+        return $filter->manyFilters(Transaction::orderBy("updated_at", "DESC")->get(), [
             "client" => "client_id",
             "type" => "type"
         ]);

@@ -48,7 +48,10 @@ class ProfileService
 
     public function decreaseBalance(string|int $identifier, int $count): bool
     {
-        $client = $this->clientsService->get_client_by_identifier($identifier);
+        if ($count <= 0)
+            return false;
+
+        $client = $this->clientsService->getClientByIdentifier($identifier);
         if ($client->balance < $count) {
             return false;
         }
@@ -59,23 +62,31 @@ class ProfileService
 
     public function increaseBalance(string|int $identifier, int $count): bool
     {
-        $client = $this->clientsService->get_client_by_identifier($identifier);
+        if ($count <= 0)
+            return false;
+
+        $client = $this->clientsService->getClientByIdentifier($identifier);
         $client->increment("balance", $count);
 
         return true;
     }
 
     public function addItem(string|int $identifier, int $item_id) {
-        $client = $this->clientsService->get_client_by_identifier($identifier);
+        $client = $this->clientsService->getClientByIdentifier($identifier);
         Inventory::create([
             "client_id" => $client->id,
             "item_id" => $item_id
         ]);
     }
 
-    public function sellItems(string|int $identifier, array $ids) {
-        $client = $this->clientsService->get_client_by_identifier($identifier);
-        $to_delete = Inventory::whereIn("id", $ids)->where([["client_id", "=", $client->id]]);
+    public function sellItems(string|int $client_identifier, array $ids): int|null
+    {
+        $client = $this->clientsService->getClientByIdentifier($client_identifier);
+
+        if (!$client)
+            throw new Exception("client is null");
+
+        $to_delete = Inventory::whereIn("id", $ids)->where("client_id", "=", $client->id);
         $coins = 0;
         $items_count = [];
         foreach ($to_delete->get() as $slot) {
@@ -88,8 +99,23 @@ class ProfileService
         foreach (array_keys($items_count) as $item) {
             $coins += Item::whereId($item)->first()->price * $items_count[$item];
         }
-        $to_delete->delete();
-        $this->increaseBalance($identifier, $coins);
-        return $coins;
+
+        DB::beginTransaction();
+        try
+        {
+            $to_delete->delete();
+
+            $this->increaseBalance($client_identifier, $coins);
+
+            $this->transactionService->declare($client->id, $coins, TransactionTypes::Sale);
+
+            DB::commit();
+            return $coins;
+        }
+        catch (Exception $exception)
+        {
+            DB::rollBack();
+            return null;
+        }
     }
 }

@@ -11,23 +11,23 @@ use \Illuminate\Database\Eloquent\Collection;
 
 class ClientsService
 {
-    public function get_clients(): array|Collection
+    public function getClients(): array|Collection
     {
-        return $this->filter_clients()->get();
+        return $this->filterClients()->get();
     }
 
-    public function get_client_by_identifier(string|int $identifier): Client | null
+    public function getClientByIdentifier(string|int $identifier): Client | null
     {
         $filter_field = is_numeric($identifier) ? 'clients.id' : 'clients.login';
 
-        return $this->filter_clients()
+        return $this->filterClients()
             ->where($filter_field, '=', $identifier)
             ->first();
     }
 
-    public function get_inventory(string|int $identifier): Collection | null
+    public function getInventory(string|int $identifier): Collection | null
     {
-        $client = $this->get_client_by_identifier($identifier);
+        $client = $this->getClientByIdentifier($identifier);
 
         return $client
             ?->hasManyThrough(Item::class, Inventory::class,
@@ -35,7 +35,7 @@ class ClientsService
             ->getResults();
     }
 
-    private function filter_clients(): Builder|Client
+    private function filterClients(): Builder|Client
     {
         return Client::where("permission", "=", Permissions::User);
     }

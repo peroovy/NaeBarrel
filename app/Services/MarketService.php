@@ -19,7 +19,7 @@ class MarketService
     }
 
     public function putItem($identifier, $itemId, $price) {
-        $client = $this->clientsService->get_client_by_identifier($identifier);
+        $client = $this->clientsService->getClientByIdentifier($identifier);
         $item = Inventory::where([["client_id", "=", $client->id], ["item_id", "=", $itemId]]);
         if (!$item->exists()) {
             return response(status: 400);

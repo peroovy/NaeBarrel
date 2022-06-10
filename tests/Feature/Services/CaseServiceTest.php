@@ -2,12 +2,20 @@
 
 namespace Tests\Feature;
 
+use App\Enums\Permissions;
 use App\Enums\Qualities;
+use App\Enums\TransactionTypes;
 use App\Models\CaseItem;
+use App\Models\Client;
 use App\Models\Item;
 use App\Models\NBCase;
+use App\Models\Permission;
 use App\Models\Quality;
+use App\Models\TransactionType;
 use App\Services\CaseService;
+use App\Services\ClientsService;
+use App\Services\ProfileService;
+use App\Services\TransactionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use phpmock\Mock;
 use phpmock\MockBuilder;
@@ -19,6 +27,7 @@ class CaseServiceTest extends TestCase
 
     private NBCase $case;
     private NBCase $unsaved_case;
+    private Client $client;
 
     /** @var Item[] */
     private array $items;
@@ -27,7 +36,7 @@ class CaseServiceTest extends TestCase
 
     public function __construct(?string $name = null, array $data = [], $dataName = '')
     {
-        $this->service = new CaseService();
+        $this->service = new CaseService(new ProfileService(new ClientsService(), new TransactionService()), new TransactionService());
 
         parent::__construct($name, $data, $dataName);
     }
@@ -35,6 +44,20 @@ class CaseServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        foreach (Permissions::asArray() as $name => $id)
+            Permission::insert(["id" => $id, "name" => $name]);
+
+        foreach (TransactionTypes::asArray() as $name => $id)
+            TransactionType::insert(["id" => $id, "name" => $name]);
+
+        $this->client = Client::create([
+            "login" => "login1",
+            "email" => "email1",
+            "password" => \Hash::make($this->client_password = "secret1"),
+            "permission" => Permissions::User,
+            "balance" => 100000
+        ]);
 
         $this->case = NBCase::create([
             "name" => "case",
@@ -79,7 +102,7 @@ class CaseServiceTest extends TestCase
     {
         $actual = $this->service->createCase($this->case->name, "another", 10, "345.jpg", []);
 
-        $this->assertFalse($actual);
+        $this->assertNull($actual);
     }
 
     public function test_creating_case__without_items()
@@ -104,7 +127,7 @@ class CaseServiceTest extends TestCase
 
         $case_items = [];
         foreach ($this->items as $item)
-            $case_items[$item->id] = $chance;
+            $case_items[] = ["id" => $item->id, "chance" => $chance];
 
         $actual = $this->service->createCase($expected->name, $expected->description, $expected->price, $expected->picture, $case_items);
 
@@ -122,7 +145,7 @@ class CaseServiceTest extends TestCase
     {
         $this->unsaved_case->save();
 
-        $this->assertNull($this->service->OpenCase($this->unsaved_case));
+        $this->assertNull($this->service->tryPlayRoulette($this->client, $this->unsaved_case));
     }
 
     public function test_opening_case()
@@ -137,6 +160,9 @@ class CaseServiceTest extends TestCase
 
         $expected_1 = $this->items[0];
         $expected_2 = $this->items[1];
+
+        $this->client->balance = $expected_1->price + $expected_2->price + 1;
+        $this->client->save();
 
         CaseItem::create([
             "case_id" => $this->case->id,
@@ -157,7 +183,7 @@ class CaseServiceTest extends TestCase
     private function assert_opening_case(Mock $random_int_mock, Item $expected)
     {
         $random_int_mock->enable();
-        $actual = $this->service->OpenCase($this->case);
+        $actual = $this->service->tryPlayRoulette($this->client, $this->case);
         $random_int_mock->disable();
 
         $this->assertEquals($expected["id"], $actual["id"]);

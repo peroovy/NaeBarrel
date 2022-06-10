@@ -25,7 +25,7 @@ class ItemApiController extends Controller
     }
 
     public function items() {
-        return ItemResource::collection($this->service->GetAll());
+        return ItemResource::collection($this->service->get());
     }
 
     public function index(Item $item_id) {
@@ -43,7 +43,7 @@ class ItemApiController extends Controller
         if ($validator->fails()) {
             return response(status: 400);
         }
-        $item = $this->service->CreateItem(
+        $item = $this->service->create(
             $request["name"],
             $request["description"],
             $request["price"],

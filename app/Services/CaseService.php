@@ -46,7 +46,7 @@ class CaseService
 
             $case_items = [];
             foreach ($items as $item) {
-                $case_items[] =[
+                $case_items[] = [
                     "case_id" => $case->id,
                     "item_id" => $item["id"],
                     "chance" => $item["chance"]
@@ -64,7 +64,7 @@ class CaseService
         }
     }
 
-    public function tryOpenCase(Client $user, NBCase $case): Item | null
+    public function tryPlayRoulette(Client $user, NBCase $case): Item | null
     {
         DB::beginTransaction();
         try

@@ -31,7 +31,7 @@ class ProfileController extends Controller
 
     public function inventory(): AnonymousResourceCollection
     {
-        $items = $this->clientsService->get_inventory(Auth::user()->id);
+        $items = $this->clientsService->getInventory(Auth::user()->id);
 
         return ItemResource::collection($items);
     }

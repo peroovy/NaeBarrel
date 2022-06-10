@@ -316,7 +316,7 @@ class CaseControllerTest extends TestCase
                     ->where("price", $this->item_in_case->price)
                     ->where("quality", $this->item_in_case->quality)
                     ->where("picture", $this->item_in_case->picture)
-                    ->has("chance");
+                    ->etc();
             });
 
         $this->assertDatabaseHas(Client::class, ["login" => $this->client->login, "balance" => $expected_balance]);
@@ -340,7 +340,7 @@ class CaseControllerTest extends TestCase
                 ->where("price", $this->item_in_case->price)
                 ->where("quality", $this->item_in_case->quality)
                 ->where("picture", $this->item_in_case->picture)
-                ->has("chance")
+                ->etc()
             );
     }
 }

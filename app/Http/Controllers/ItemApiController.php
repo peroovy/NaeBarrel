@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Qualities;
 use App\Http\Resources\ItemResource;
 use App\Models\Inventory;
 use App\Models\Item;
@@ -9,6 +10,7 @@ use App\Models\Quality;
 use App\Services\ClientsService;
 use App\Services\ItemService;
 use App\Services\ProfileService;
+use BenSampo\Enum\Rules\EnumValue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -34,11 +36,11 @@ class ItemApiController extends Controller
 
     public function create(Request $request) {
         $validator = Validator::make($request->all(), [
-            "name" => ["required"],
-            "description" => ["required"],
-            "price" => ["required"],
+            "name" => ["required", "string"],
+            "description" => ["required", "string"],
+            "price" => ["required", "integer"],
             "picture" => ["required"],
-            "quality" => ["sometimes"]
+            "quality" => ["sometimes", new EnumValue(Qualities::class)]
         ]);
         if ($validator->fails()) {
             return response(status: 400);
@@ -53,15 +55,16 @@ class ItemApiController extends Controller
         if ($item) {
             return new ItemResource($item);
         }
-        return response(status: 400);
+        return response(status: 422);
     }
 
     public function sell(Request $request) {
         if (!array_key_exists("item_ids", $request->all())) {
             return response(status: 400);
         }
+
         $profit = $this->profileService->sellItems(Auth::user()->id, $request["item_ids"]);
 
-        return $profit;
+        return $profit != null ? ["profit" => $profit] : response(status: 422);
     }
 }

@@ -18,7 +18,6 @@ class ProfileController extends Controller
 {
     public function __construct(
         private ProfileService $profileService,
-        private ClientsService $clientsService
     )
     {
 
@@ -40,6 +39,6 @@ class ProfileController extends Controller
 
         $is_success = $this->profileService->tryAccrue(Auth::user(), $request['amount']);
 
-        return response(status: $is_success ? 200 : 500);
+        return response(status: $is_success ? 200 : 422);
     }
 }

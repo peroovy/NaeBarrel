@@ -1,7 +1,7 @@
 function putOnMarket() {
     let price = document.querySelector('.market-field').value;
-    if (price === null) {
-        return
+    if (price === '') {
+        return;
     }
 
     let invId = document.querySelector('.openedItem').id;
@@ -9,7 +9,6 @@ function putOnMarket() {
         "inventory_id": parseInt(invId),
         "price": parseInt(price)
     });
-    console.log(post);
 
     fetch("/api/market/createlot", {
         method: 'POST',
@@ -19,13 +18,30 @@ function putOnMarket() {
         },
         body: post
     }).then(response => {
-        console.log("done!")
         return response.json();
     }).then(data => {
-        console.log(data)
+        location.reload();
     })
 }
 
+function sellItem() {
+    let invId = document.querySelector('.openedItem').id;
+    let post = JSON.stringify({
+        "item_ids": [parseInt(invId)]
+    });
+    fetch("/api/items/sell", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': localStorage.getItem("loginToken")
+        },
+        body: post
+    }).then(response => {
+        return response.json();
+    }).then(data => {
+        location.reload();
+    })
+}
 
 function closeItem() {
     document.querySelector('.openedItem').classList.add('hidden');

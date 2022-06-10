@@ -18,6 +18,9 @@ function openBarrel(){
         },
         body: post
     }).then(response => {
+        if (response.status === 401) {
+            window.location.href = "/login/";
+        }
         return response.json();
     }).then(data => {
         console.log(data)
@@ -33,7 +36,7 @@ function openBarrel(){
             document.querySelector(".actually-drop-size").src = '../pic/fish.png';
             name.textContent = data["name"];
         }
-    })
+    });
 
 }
 

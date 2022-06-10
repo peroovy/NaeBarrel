@@ -31,3 +31,7 @@ Route::get('/open', function () {
 Route::get('/login', function () {
     return view('auth');
 });
+
+Route::get('/{login}', function ($login=false) {
+    return view('inventory', ["login" => $login]);
+});

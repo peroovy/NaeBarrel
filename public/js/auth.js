@@ -19,5 +19,6 @@ function login() {
     }).then(data => {
         localStorage.setItem("loginToken", "Bearer " + data['token']);
         console.log("done!")
+        window.location.href = '/';
     });
 }

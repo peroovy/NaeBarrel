@@ -29,13 +29,6 @@ class ProfileController extends Controller
         return new ClientResource(Auth::user());
     }
 
-    public function inventory(): AnonymousResourceCollection
-    {
-        $items = $this->clientsService->getInventory(Auth::user()->id);
-
-        return ItemResource::collection($items);
-    }
-
     public function accrue(Request $request)
     {
         $validator = Validator::make($request->all(), [

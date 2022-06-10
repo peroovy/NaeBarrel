@@ -46,7 +46,7 @@ class ClientsController extends Controller
     {
         $items = $this->clientService->getInventory($identifier);
 
-        if (!$items)
+        if ($items == null)
             return response(status: 404);
 
         $filtered = $this->filterService->getFiltered($items, 'quality_id', 'quality');

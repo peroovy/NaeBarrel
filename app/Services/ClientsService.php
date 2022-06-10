@@ -18,7 +18,12 @@ class ClientsService
 
     public function getClientByIdentifier(string|int $identifier): Client | null
     {
-        $filter_field = is_numeric($identifier) ? 'clients.id' : 'clients.login';
+        $filter_field = 'clients.login';
+        if (is_numeric($identifier))
+        {
+            $filter_field = 'clients.id';
+            $identifier = intval($identifier);
+        }
 
         return $this->filterClients()
             ->where($filter_field, '=', $identifier)

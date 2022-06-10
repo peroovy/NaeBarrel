@@ -1,0 +1,127 @@
+body {
+    margin:0;
+    background-color: #F7BA44;
+    overflow: auto;
+}
+
+.background {
+    height: 100vh;
+    background: linear-gradient(176deg, #F9DF9F 30%, #F7BA44 25%);
+}
+
+.icon {
+    position: absolute;
+    width: 50vh;
+    height: auto;
+    left: 20vw;
+    top: 9vh;
+}
+
+.profile {
+    position: absolute;
+    border-radius: 50%;
+    width: 15vh;
+    height: 15vh;
+    background: #D8A136;
+    right: 20vw;
+    top: 12vh;
+}
+
+.profile-balance {
+    position: absolute;
+    border-radius: 2vw;
+    background: #DC950B;
+    width: 20vh;
+    height: 6vh;
+    right: 23vw;
+    top: 21vh;
+    transform: rotate(-5deg)
+}
+
+.shop-list {
+    position: absolute;
+    top: 45vh;
+    left: 50%;
+    transform: translate(-50%, 0);
+    place-items: center;
+    display: grid;
+    grid-template-columns: 30vh 30vh 30vh 30vh;
+    grid-template-rows: 35vh 35vh;
+    padding-bottom: 10vh;
+}
+
+.barrel {
+    filter: drop-shadow(20px 10px 2px rgba(0, 0, 0, 0.25));
+    transition: 0.2s;
+}
+
+.barrel:hover {
+    transform: scale(1.2);
+}
+
+.barrel-size {
+    width: 20vh;
+    height: auto;
+}
+
+.name {
+    font-size: 4vh;
+    position: absolute;
+    top: -3vh;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
+.price {
+    font-size: 4vh;
+    position: absolute;
+    top: 18vh;
+    left: 50%;
+    transform: translate(-50%, 0)
+    rotate(-5deg);
+}
+
+.inv-list {
+    position: absolute;
+    top: 45vh;
+    left: 50%;
+    transform: translate(-50%, 0);
+    place-items: center;
+    display: grid;
+    grid-template-columns: 20vh 20vh 20vh 20vh 20vh 20vh;
+    grid-template-rows: 15vh;
+    grid-column-gap: 1vh;
+    grid-row-gap: 1.5vh;
+}
+
+.block {
+    width: 20vh;
+    height: auto;
+    background-color: #D29E3A;
+    border-radius: 2.5vh;
+    transition: 0.2s;
+}
+
+.block:hover {
+    transform: scale(1.2);
+}
+
+.fish-size {
+    padding-left: 2vh;
+    width: 16vh;
+    height: auto;
+}
+
+.iname {
+    position: absolute;
+    font-size: 4vh;
+    margin-top: -16vh;
+    margin-left: 1vh;
+}
+
+.iprice {
+    position: absolute;
+    font-size: 4vh;
+    margin-top: -5vh;
+    margin-left: 10vh;
+}

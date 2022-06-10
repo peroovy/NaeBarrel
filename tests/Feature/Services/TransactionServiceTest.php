@@ -59,7 +59,7 @@ class TransactionServiceTest extends TestCase
 
         $this->transactions[] = Transaction::create([
             "client_id" => $another->id,
-            "type" => TransactionTypes::Buying,
+            "type" => TransactionTypes::CaseBuying,
             "accrual" => 10
         ]);
     }
@@ -82,7 +82,7 @@ class TransactionServiceTest extends TestCase
 
     public function test_getting_all__specific_type()
     {
-        $_GET["type"] = TransactionTypes::Buying;
+        $_GET["type"] = TransactionTypes::CaseBuying;
         $this->assert_getting_all(Transaction::where("type", "=", $_GET["type"]));
     }
 

@@ -33,6 +33,8 @@ class Transaction extends Model
         'accrual'
     ];
 
+    public $timestamps = true;
+
     public function GetType() {
         return $this->hasOne(TransactionType::class, 'id', 'type')->get();
     }

@@ -22,7 +22,7 @@ class ItemResource extends JsonResource
             'quality' => $this->quality,
             'picture' => $this->picture
         ];
-
+        
         return $item;
     }
 }

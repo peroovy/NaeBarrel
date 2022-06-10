@@ -45,7 +45,7 @@ class ClientsController extends Controller
     public function inventory(string|int $identifier): AnonymousResourceCollection | Response
     {
         $items = $this->clientService->get_inventory($identifier);
-        
+
         if (!$items)
             return response(status: 404);
 

@@ -14,9 +14,11 @@ use Throwable;
 class ProfileService
 {
     private ClientsService $clientsService;
+    private TransactionService $transactionService;
 
-    public function __construct(ClientsService $clientsService) {
+    public function __construct(ClientsService $clientsService, TransactionService $transactionService) {
         $this->clientsService = $clientsService;
+        $this->transactionService = $transactionService;
     }
 
 
@@ -31,11 +33,7 @@ class ProfileService
             {
                 $client->increment('balance', $amount);
 
-                $transaction = Transaction::create([
-                    'type' => TransactionTypes::Daily,
-                    'client_id' => $client->id,
-                    'accrual' => $amount
-                ]);
+                $transaction = $this->transactionService->Create($client->id, $amount, TransactionTypes::Daily);
 
                 $client->update(['last_accrual' => $transaction->created_at]);
             });
@@ -48,20 +46,22 @@ class ProfileService
         }
     }
 
-    public function DecreaseBalance(string|int $identifier, int $count): bool
+    public function DecreaseBalance(string|int $identifier, int $count, $transType): bool
     {
         $client = $this->clientsService->get_client_by_identifier($identifier);
         if ($client->balance < $count) {
             return false;
         }
         $client->decrement("balance", $count);
+        $this->transactionService->Create($client->id, -$count, $transType);
         return true;
     }
 
-    public function IncreaseBalance(string|int $identifier, int $count): bool
+    public function IncreaseBalance(string|int $identifier, int $count, $transType): bool
     {
         $client = $this->clientsService->get_client_by_identifier($identifier);
         $client->increment("balance", $count);
+        $this->transactionService->Create($client->id, $count, $transType);
         return true;
     }
 
@@ -89,7 +89,7 @@ class ProfileService
             $coins += Item::whereId($item)->first()->price * $items_count[$item];
         }
         $to_delete->delete();
-        $this->IncreaseBalance($identifier, $coins);
+        $this->IncreaseBalance($identifier, $coins, TransactionTypes::Sale);
         return $coins;
     }
 }

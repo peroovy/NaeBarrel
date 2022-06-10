@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\TransactionTypes;
 use App\Http\Resources\ItemResource;
 use App\Models\Inventory;
 use App\Models\Item;
@@ -39,10 +40,10 @@ class MarketService
             return response(status: 400);
         }
         $lot = $lot->first();
-        if (!$this->profileService->DecreaseBalance($identifier, $lot['price'])) {
+        if (!$this->profileService->DecreaseBalance($identifier, $lot['price'], TransactionTypes::ItemBuying)) {
             return ["error_status" => "NotEnoughMoney"];
         }
-        $this->profileService->IncreaseBalance($lot['client_id'], $lot['price']);
+        $this->profileService->IncreaseBalance($lot['client_id'], $lot['price'], TransactionTypes::Sale);
         $this->profileService->AddItem($identifier, $lot['item_id']);
         $item = Item::whereId($lot['item_id'])->first();
         $lot->delete();

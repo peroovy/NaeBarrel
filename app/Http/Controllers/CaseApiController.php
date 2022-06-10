@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TransactionTypes;
 use App\Http\Resources\CaseResource;
 use App\Http\Resources\ItemResource;
 use App\Models\Client;
 use App\Models\Item;
 use App\Models\NBCase;
+use App\Models\TransactionType;
 use App\Services\CaseService;
 use App\Services\ClientsService;
 use App\Services\ProfileService;
@@ -83,14 +85,14 @@ class CaseApiController extends Controller
 
         $user = Auth::user();
 
-        if (!$this->profileService->DecreaseBalance($user, $case->price)) {
+        if (!$this->profileService->DecreaseBalance($user->id, $case->price, TransactionTypes::CaseBuying)) {
             return ["error_status" => "NotEnoughMoney"];
         }
         $item = $this->service->OpenCase($case);
         if ($item == null) {
             return response(status: 400);
         }
-        $this->profileService->AddItem($user, $item["id"]);
+        $this->profileService->AddItem($user->id, $item["id"]);
         return new ItemResource($item);
     }
 }

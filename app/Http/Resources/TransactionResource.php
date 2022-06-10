@@ -19,7 +19,7 @@ class TransactionResource extends JsonResource
             "client" => $this->client_id,
             "type" => $this->GetType(),
             "accrual" => $this->accrual,
-            "date" => $this->date
+            "date" => $this->updated_at
         ];
     }
 }

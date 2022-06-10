@@ -92,7 +92,7 @@ class ProfileServiceTest extends TestCase
     {
         $amount = 1;
         $new_balance = $this->balance + $amount;
-        $this->assertTrue($this->service->try_accrue($this->client, $amount));
+        $this->assertTrue($this->service->tryAccrue($this->client, $amount));
 
         $actual = $this->client->refresh();
         $this->assertEquals($new_balance, $actual->balance);
@@ -108,8 +108,8 @@ class ProfileServiceTest extends TestCase
 
     public function test_accrue__invalid_amount()
     {
-        $this->assertFalse($this->service->try_accrue($this->client, -10));
-        $this->assertFalse($this->service->try_accrue($this->client, 0));
+        $this->assertFalse($this->service->tryAccrue($this->client, -10));
+        $this->assertFalse($this->service->tryAccrue($this->client, 0));
 
         $actual = $this->client->refresh();
         $this->assertEquals($this->balance, $actual->balance);
@@ -121,7 +121,7 @@ class ProfileServiceTest extends TestCase
      */
     public function test_decreasing_balance(int $count)
     {
-        $this->assertTrue($this->service->DecreaseBalance($this->client, $count));
+        $this->assertTrue($this->service->decreaseBalance($this->client, $count));
 
         $actual = $this->client->refresh();
         $this->assertEquals($this->balance - $count, $actual->balance);
@@ -137,7 +137,7 @@ class ProfileServiceTest extends TestCase
      */
     public function test_decreasing_balance__bad_count(int $count)
     {
-        $this->assertFalse($this->service->DecreaseBalance($this->client, $count));
+        $this->assertFalse($this->service->decreaseBalance($this->client, $count));
 
         $actual = $this->client->refresh();
         $this->assertEquals($this->balance, $actual->balance);
@@ -153,7 +153,7 @@ class ProfileServiceTest extends TestCase
      */
     public function test_increasing_balance(int $count)
     {
-        $this->assertTrue($this->service->IncreaseBalance($this->client, $count));
+        $this->assertTrue($this->service->increaseBalance($this->client, $count));
 
         $actual = $this->client->refresh();
         $this->assertEquals($this->balance + $count, $actual->balance);
@@ -169,7 +169,7 @@ class ProfileServiceTest extends TestCase
      */
     public function test_increasing_balance__bad_count(int $count)
     {
-        $this->assertFalse($this->service->IncreaseBalance($this->client, $count));
+        $this->assertFalse($this->service->increaseBalance($this->client, $count));
 
         $actual = $this->client->refresh();
         $this->assertEquals($this->balance, $actual->balance);
@@ -191,7 +191,7 @@ class ProfileServiceTest extends TestCase
         $ids = array_merge(array_fill(0, $common_count, $this->common->id),
             array_fill(0, $uncommon_count, $this->uncommon->id));
 
-        $actual_coins = $this->service->SellItems($this->client, $ids);
+        $actual_coins = $this->service->sellItems($this->client, $ids);
         $this->assertEquals($expected_coins, $actual_coins);
 
         $actual = $this->client->refresh();

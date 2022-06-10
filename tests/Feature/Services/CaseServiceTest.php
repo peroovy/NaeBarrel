@@ -71,13 +71,13 @@ class CaseServiceTest extends TestCase
 
     public function test_existing_case(string $unknown_name = "pistol")
     {
-        $this->assertTrue($this->service->CaseExists($this->case->name));
-        $this->assertFalse($this->service->CaseExists($unknown_name));
+        $this->assertTrue($this->service->caseExists($this->case->name));
+        $this->assertFalse($this->service->caseExists($unknown_name));
     }
 
     public function test_creating_case__name_already_exists()
     {
-        $actual = $this->service->CreateCase($this->case->name, "another", 10, "345.jpg", []);
+        $actual = $this->service->createCase($this->case->name, "another", 10, "345.jpg", []);
 
         $this->assertFalse($actual);
     }
@@ -86,7 +86,7 @@ class CaseServiceTest extends TestCase
     {
         $expected = $this->unsaved_case;
 
-        $actual = $this->service->CreateCase(
+        $actual = $this->service->createCase(
             $expected->name,
             $expected->description,
             $expected->price,
@@ -106,7 +106,7 @@ class CaseServiceTest extends TestCase
         foreach ($this->items as $item)
             $case_items[$item->id] = $chance;
 
-        $actual = $this->service->CreateCase($expected->name, $expected->description, $expected->price, $expected->picture, $case_items);
+        $actual = $this->service->createCase($expected->name, $expected->description, $expected->price, $expected->picture, $case_items);
 
         $this->assert_creating_case($expected, $actual);
 

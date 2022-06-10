@@ -60,7 +60,7 @@ class ItemApiController extends Controller
         if (!array_key_exists("item_ids", $request->all())) {
             return response(status: 400);
         }
-        $profit = $this->profileService->SellItems(Auth::user()->id, $request["item_ids"]);
+        $profit = $this->profileService->sellItems(Auth::user()->id, $request["item_ids"]);
 
         return $profit;
     }

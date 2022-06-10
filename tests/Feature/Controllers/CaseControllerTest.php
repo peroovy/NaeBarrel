@@ -4,12 +4,16 @@ namespace Tests\Feature\Controllers;
 
 use App\Enums\Permissions;
 use App\Enums\Qualities;
+use App\Enums\TransactionTypes;
 use App\Models\CaseItem;
 use App\Models\Client;
+use App\Models\Inventory;
 use App\Models\Item;
 use App\Models\NBCase;
 use App\Models\Permission;
 use App\Models\Quality;
+use App\Models\Transaction;
+use App\Models\TransactionType;
 use App\Services\AuthenticationService;
 use App\Services\CaseService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -20,19 +24,21 @@ use Tests\TestCase;
 
 class CaseControllerTest extends TestCase
 {
-    // TODO: add buy tests
-
     /**
      * @var NBCase[]
      */
     private array $cases;
 
     private NBCase $case;
-    private Item $item1;
+    private NBCase $empty_case;
+    private Item $item_in_case;
     private Item $item2;
 
     private Client $client;
-    private array $headers;
+    private array $client_headers;
+
+    private Client $admin;
+    private array $admin_headers;
 
     use RefreshDatabase;
 
@@ -43,21 +49,35 @@ class CaseControllerTest extends TestCase
         foreach (Permissions::asArray() as $name => $id)
             Permission::insert(["id" => $id, "name" => $name]);
 
+        foreach (TransactionTypes::asArray() as $name => $id)
+            TransactionType::insert(["id" => $id, "name" => $name]);
+
         $this->client = Client::create([
             "login" => "login",
             "email" => "email@email",
             "password" => "secret",
+            "permission" => Permissions::User
+        ]);
+        $this->client_headers = [
+            "Authorization" => "Bearer " . $this->client->createToken(AuthenticationService::$TOKEN_NAME)
+                    ->plainTextToken
+        ];
+
+        $this->admin = Client::create([
+            "login" => "admin",
+            "email" => "admin@admin",
+            "password" => "secret",
             "permission" => Permissions::Admin
         ]);
-        $this->headers = [
-            "Authorization" => "Bearer " . $this->client->createToken(AuthenticationService::$TOKEN_NAME)
+        $this->admin_headers = [
+            "Authorization" => "Bearer " . $this->admin->createToken(AuthenticationService::$TOKEN_NAME)
                     ->plainTextToken
         ];
 
         foreach (Qualities::asArray() as $name => $id)
             Quality::insert(["id" => $id, "name" => $name]);
 
-        $this->item1 = Item::create([
+        $this->item_in_case = Item::create([
             "name" => "item",
             "description" => "description",
             "price" => 10,
@@ -80,9 +100,9 @@ class CaseControllerTest extends TestCase
             "picture" => "pic1.jpg",
         ]);
 
-        CaseItem::insert(["case_id" => $this->case->id, "item_id" => $this->item1->id, "chance" => 1]);
+        CaseItem::insert(["case_id" => $this->case->id, "item_id" => $this->item_in_case->id, "chance" => 1]);
 
-        $this->cases[] = NBCase::create([
+        $this->cases[] = $this->empty_case = NBCase::create([
             "name" => "case2",
             "description" => "desc2",
             "price" => 20,
@@ -92,7 +112,7 @@ class CaseControllerTest extends TestCase
 
     public function test_getting_cases()
     {
-        $response = $this->get("api/cases", $this->headers);
+        $response = $this->get("api/cases", $this->client_headers);
 
         $response->assertOk();
         $response->assertJson(function (AssertableJson $json)
@@ -104,9 +124,9 @@ class CaseControllerTest extends TestCase
 
     public function test_getting_case()
     {
-        $this->get("api/cases/-1", $this->headers)->assertNotFound();
+        $this->get("api/cases/-1", $this->client_headers)->assertNotFound();
 
-        $response = $this->get("api/cases/" . $this->case->id, $this->headers);
+        $response = $this->get("api/cases/" . $this->case->id, $this->client_headers);
 
         $response->assertOk();
         $response->assertJson(fn (AssertableJson $json) => $this->assert_case($json));
@@ -117,7 +137,7 @@ class CaseControllerTest extends TestCase
      */
     public function test_creating_case__validation_error(array $body)
     {
-        $this->postJson("api/cases", $body, $this->headers)
+        $this->postJson("api/cases", $body, $this->admin_headers)
             ->assertStatus(400);
 
         if (array_key_exists("items", $body))
@@ -159,7 +179,7 @@ class CaseControllerTest extends TestCase
             "items" => []
         ];
 
-        $this->postJson("api/cases", $body, $this->headers)->assertStatus(422);
+        $this->postJson("api/cases", $body, $this->admin_headers)->assertStatus(400);
         $this->assertCount(1, NBCase::where("name", "=", $this->case->name)->get());
     }
 
@@ -168,23 +188,23 @@ class CaseControllerTest extends TestCase
     {
         $items_array = [
             [["id" => -1, "chance" => 1]],
-            [["id" => $this->item1->id, "chance" => 0.5]],
-            [["id" => $this->item1->id, "chance" => 1 + CaseService::$EPS]],
-            [["id" => $this->item1->id, "chance" => 1 - CaseService::$EPS]],
+            [["id" => $this->item_in_case->id, "chance" => 0.5]],
+            [["id" => $this->item_in_case->id, "chance" => 1 + CaseService::$EPS]],
+            [["id" => $this->item_in_case->id, "chance" => 1 - CaseService::$EPS]],
             [
-                ["id" => $this->item1->id, "chance" => 0.5],
-                ["id" => $this->item1->id, "chance" => 0.5]
+                ["id" => $this->item_in_case->id, "chance" => 0.5],
+                ["id" => $this->item_in_case->id, "chance" => 0.5]
             ],
             [
-                ["id" => $this->item1->id, "chance" => 0.5],
+                ["id" => $this->item_in_case->id, "chance" => 0.5],
                 ["id" => $this->item2->id, "chance" => 0.6],
             ],
             [
-                ["id" => $this->item1->id, "chance" => 0.4],
+                ["id" => $this->item_in_case->id, "chance" => 0.4],
                 ["id" => $this->item2->id, "chance" => 0.6 + CaseService::$EPS],
             ],
             [
-                ["id" => $this->item1->id, "chance" => 0.4],
+                ["id" => $this->item_in_case->id, "chance" => 0.4],
                 ["id" => $this->item2->id, "chance" => 0.6 - CaseService::$EPS],
             ],
         ];
@@ -199,7 +219,7 @@ class CaseControllerTest extends TestCase
                 "items" => $items
             ];
 
-            $this->postJson("api/cases", $body, $this->headers)->assertStatus(422);
+            $this->postJson("api/cases", $body, $this->admin_headers)->assertStatus(422);
         }
     }
 
@@ -213,7 +233,7 @@ class CaseControllerTest extends TestCase
             "items" => []
         ];
 
-        $this->postJson("api/cases", $body, $this->headers)->assertCreated();
+        $this->postJson("api/cases", $body, $this->admin_headers)->assertCreated();
         $this->assertDatabaseHas(NBCase::class, ["name" => $body["name"]]);
     }
 
@@ -225,12 +245,12 @@ class CaseControllerTest extends TestCase
             "price" => 1000,
             "picture" => "1.jpg",
             "items" => [
-                ["id" => $this->item1->id, "chance" => 0.25],
+                ["id" => $this->item_in_case->id, "chance" => 0.25],
                 ["id" => $this->item2->id, "chance" => 0.75],
             ]
         ];
 
-        $this->postJson("api/cases", $body, $this->headers)->assertCreated();
+        $this->postJson("api/cases", $body, $this->admin_headers)->assertCreated();
         $this->assertDatabaseHas(NBCase::class, ["name" => $body["name"]]);
 
         $actual = NBCase::where("name", "=", $body["name"])->first();
@@ -245,6 +265,66 @@ class CaseControllerTest extends TestCase
         }
     }
 
+    /**
+     * @dataProvider provide_bad_case_id
+     */
+    public function test_buying__validation_error($id)
+    {
+        $this->postJson("api/cases/buy", ["case_id" => $id], $this->client_headers)->assertStatus(400);
+    }
+
+    public function provide_bad_case_id(): array
+    {
+        return [["a"], [null], [[]]];
+    }
+
+    public function test_buying__not_found()
+    {
+        $this->postJson("api/cases/buy", ["case_id" => -1], $this->client_headers)->assertStatus(404);
+    }
+
+    public function test_buying__opening_error()
+    {
+        foreach ([$this->case->id, $this->empty_case->id] as $id)
+        {
+            foreach ([0, $this->case->price - 1] as $balance)
+            {
+                $this->client->balance = $balance;
+                $this->client->save();
+
+                $this->postJson("api/cases/buy", ["case_id" => $id], $this->client_headers)
+                    ->assertStatus(422);
+
+                $this->assertDatabaseHas(Client::class, ["login" => $this->client->login, "balance" => $balance]);
+            }
+        }
+    }
+
+    public function test_buying()
+    {
+        $expected_balance = 1;
+        $this->client->balance = $this->case->price + $expected_balance;
+        $this->client->save();
+
+        $this->postJson("api/cases/buy", ["case_id" => $this->case->id], $this->client_headers)
+            ->assertOk()
+            ->assertJson(function (AssertableJson $json)
+            {
+                return $json->where("id", $this->item_in_case->id)
+                    ->where("name", $this->item_in_case->name)
+                    ->where("description", $this->item_in_case->description)
+                    ->where("price", $this->item_in_case->price)
+                    ->where("quality", $this->item_in_case->quality)
+                    ->where("picture", $this->item_in_case->picture);
+            });
+
+        $this->assertDatabaseHas(Client::class, ["login" => $this->client->login, "balance" => $expected_balance]);
+        $this->assertDatabaseHas(Inventory::class, ["client_id" => $this->client->id, "item_id" => $this->item_in_case->id]);
+        $this->assertDatabaseHas(Transaction::class,
+            ["client_id" => $this->client->id, "type" => TransactionTypes::CaseBuying, "accrual" => $this->case->price]
+        );
+    }
+
     private function assert_case(AssertableJson $json): AssertableJson|Matching
     {
         return $json->where("id", $this->case->id)
@@ -253,12 +333,12 @@ class CaseControllerTest extends TestCase
             ->where("price", $this->case->price)
             ->has("items", 1)
             ->has("items.0", fn (AssertableJson $json) => $json
-                ->where("id", $this->item1->id)
-                ->where("name", $this->item1->name)
-                ->where("description", $this->item1->description)
-                ->where("price", $this->item1->price)
-                ->where("quality", $this->item1->quality)
-                ->where("picture", $this->item1->picture)
+                ->where("id", $this->item_in_case->id)
+                ->where("name", $this->item_in_case->name)
+                ->where("description", $this->item_in_case->description)
+                ->where("price", $this->item_in_case->price)
+                ->where("quality", $this->item_in_case->quality)
+                ->where("picture", $this->item_in_case->picture)
             );
     }
 }

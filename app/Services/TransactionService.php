@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Http\Resources\TransactionResource;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 class TransactionService
 {
@@ -16,11 +17,12 @@ class TransactionService
         ]);
     }
 
-    public function Create($clientId, $accrual, $type) {
-        return new TransactionResource(Transaction::create([
+    public function declare(int $clientId, int $accrual, int $type): Transaction
+    {
+        return Transaction::create([
             "type" => $type,
             "accrual" => $accrual,
             "client_id" => $clientId
-        ]));
+        ]);
     }
 }

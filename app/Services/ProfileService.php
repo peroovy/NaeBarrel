@@ -6,23 +6,23 @@ use App\Enums\TransactionTypes;
 use App\Models\Client;
 use App\Models\Inventory;
 use App\Models\Item;
+use App\Models\NBCase;
 use App\Models\Transaction;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class ProfileService
 {
-    private ClientsService $clientsService;
-    private TransactionService $transactionService;
-
-    public function __construct(ClientsService $clientsService, TransactionService $transactionService) {
-        $this->clientsService = $clientsService;
-        $this->transactionService = $transactionService;
+    public function __construct(
+        private ClientsService $clientsService,
+        private TransactionService $transactionService,
+    )
+    {
     }
 
-
-    public function try_accrue(Client $client, int $amount): bool
+    public function tryAccrue(Client $client, int $amount): bool
     {
         if ($amount <= 0)
             return false;
@@ -33,7 +33,7 @@ class ProfileService
             {
                 $client->increment('balance', $amount);
 
-                $transaction = $this->transactionService->Create($client->id, $amount, TransactionTypes::Daily);
+                $transaction = $this->transactionService->declare($client->id, $amount, TransactionTypes::Daily);
 
                 $client->update(['last_accrual' => $transaction->created_at]);
             });
@@ -46,26 +46,26 @@ class ProfileService
         }
     }
 
-    public function DecreaseBalance(string|int $identifier, int $count, $transType): bool
+    public function decreaseBalance(string|int $identifier, int $count): bool
     {
         $client = $this->clientsService->get_client_by_identifier($identifier);
         if ($client->balance < $count) {
             return false;
         }
         $client->decrement("balance", $count);
-        $this->transactionService->Create($client->id, -$count, $transType);
+
         return true;
     }
 
-    public function IncreaseBalance(string|int $identifier, int $count, $transType): bool
+    public function increaseBalance(string|int $identifier, int $count): bool
     {
         $client = $this->clientsService->get_client_by_identifier($identifier);
         $client->increment("balance", $count);
-        $this->transactionService->Create($client->id, $count, $transType);
+
         return true;
     }
 
-    public function AddItem(string|int $identifier, int $item_id) {
+    public function addItem(string|int $identifier, int $item_id) {
         $client = $this->clientsService->get_client_by_identifier($identifier);
         Inventory::create([
             "client_id" => $client->id,
@@ -73,7 +73,7 @@ class ProfileService
         ]);
     }
 
-    public function SellItems(string|int $identifier, array $ids) {
+    public function sellItems(string|int $identifier, array $ids) {
         $client = $this->clientsService->get_client_by_identifier($identifier);
         $to_delete = Inventory::whereIn("id", $ids)->where([["client_id", "=", $client->id]]);
         $coins = 0;
@@ -89,7 +89,7 @@ class ProfileService
             $coins += Item::whereId($item)->first()->price * $items_count[$item];
         }
         $to_delete->delete();
-        $this->IncreaseBalance($identifier, $coins, TransactionTypes::Sale);
+        $this->increaseBalance($identifier, $coins);
         return $coins;
     }
 }

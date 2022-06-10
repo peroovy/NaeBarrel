@@ -45,7 +45,7 @@ class ProfileController extends Controller
         if ($validator->fails())
             return response(status: 400);
 
-        $is_success = $this->profileService->try_accrue(Auth::user(), $request['amount']);
+        $is_success = $this->profileService->tryAccrue(Auth::user(), $request['amount']);
 
         return response(status: $is_success ? 200 : 500);
     }

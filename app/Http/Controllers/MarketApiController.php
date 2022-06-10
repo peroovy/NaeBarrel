@@ -32,4 +32,15 @@ class MarketApiController extends Controller
 
         return $this->marketService->putItem(Auth::user()->id, $request['item_id'], $request['price']);
     }
+
+    public function buyItem(Request $request) {
+        $validator = Validator::make($request->all(), [
+            "lot_id" => ["required"]
+        ]);
+        if ($validator->fails()) {
+            return response(status: 400);
+        }
+
+        return $this->marketService->buyItem(Auth::user()->id, $request['lot_id']);
+    }
 }

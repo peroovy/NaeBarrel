@@ -74,4 +74,5 @@ Route::middleware('auth:sanctum')->group(function ()
     });
 
     Route::post('/market/createlot', [MarketApiController::class, 'putItem']);
+    Route::post('/market/buy', [MarketApiController::class, 'buyItem']);
 });

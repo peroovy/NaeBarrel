@@ -32,6 +32,10 @@ Route::get('/login', function () {
     return view('auth');
 });
 
+Route::get('/logout', function () {
+    return view('logout');
+});
+
 Route::get('/profile/{login}', function ($login=false) {
     return view('inventory', ["login" => $login]);
 });

@@ -51,10 +51,7 @@ let rarity = {
 };
 
 fetch("/api/cases/" + barrelId, {
-    method: 'GET',
-    headers: {
-        'Authorization': 'Bearer 3|mb6CISL1AolVJ5NUbHSQYRM2jhJLGsXdgrL4HhJN'
-    }
+    method: 'GET'
 }).then(response => {
     return response.json();
 }).then(data => {
@@ -67,7 +64,7 @@ fetch("/api/cases/" + barrelId, {
     let dropList = document.querySelector('.drop-list');
     data['items'].forEach(item => {
         let drop = document.createElement('div');
-        drop.classList.add(rarity[item['quality'][0]['id']]);
+        drop.classList.add(rarity[item['quality']]);
 
         let img = document.createElement('img');
         img.src = '../pic/fish.png';

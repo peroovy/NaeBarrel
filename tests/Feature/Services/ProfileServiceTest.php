@@ -181,7 +181,7 @@ class ProfileServiceTest extends TestCase
         $expected_coins = $this->common->price + $this->uncommon->price;
         $expected_balance = $this->client->balance + $expected_coins;
 
-        $coins = $this->service->sellItems($this->client->id, [$this->common->id, $this->uncommon->id]);
+        $coins = $this->service->sellItems($this->client->id, [$this->common_in_inventory->id, $this->uncommon_in_inventory->id]);
 
         $this->client->refresh();
 

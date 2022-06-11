@@ -56,6 +56,20 @@ let rarity = {
     4: 'rare'
 };
 
+let myProfile = false;
+fetch("/api/profile/", {
+    method: 'GET',
+    headers: {
+        'Authorization': localStorage.getItem("loginToken")
+    }
+}).then(response => {
+    return response.json();
+}).then(data => {
+    myProfile = clientLogin == data['login'];
+    console.log(clientLogin);
+    console.log(data['login']);
+});
+
 fetch("/api/clients/" + clientLogin + "/inventory", {
     method: 'GET',
     headers: {
@@ -68,14 +82,16 @@ fetch("/api/clients/" + clientLogin + "/inventory", {
         let block = document.createElement('div');
         block.classList.add('block');
         block.classList.add(rarity[item['quality']]);
-        block.onclick = function () {
-            document.querySelector('.openedItem').classList.remove('hidden');
-            document.querySelector('.openedItem').id = item['inv_id'];
-            document.querySelector('.background').style.filter = "blur(5px)";
+        if (myProfile){
+            block.onclick = function () {
+                document.querySelector('.openedItem').classList.remove('hidden');
+                document.querySelector('.openedItem').id = item['inv_id'];
+                document.querySelector('.background').style.filter = "blur(5px)";
 
-            document.querySelector('.actually-drop-size').src = '../pic/fish.png';
-            document.querySelector('.actually-drop-name').textContent = item['name'];
-        };
+                document.querySelector('.actually-drop-size').src = '../pic/fish.png';
+                document.querySelector('.actually-drop-name').textContent = item['name'];
+            };
+        }
 
         let img = document.createElement('img');
         img.src = '../pic/fish.png';

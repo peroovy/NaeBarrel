@@ -111,20 +111,20 @@ body {
     transform: scale(1.2);
 }
 
-.sell{
-    position: absolute;
+.market-buy{
     display: none;
-    width: 10vh;
+    position: absolute;
+    width: 12vh;
     height: 4vh;
     background-color: #71CC75;
     border-radius: 1vh;
-    margin-top: -10vh;
-    margin-left: 5vh;
+    top: 1.5vh;
+    left: 5vh;
     text-align: center;
     font-size: 4vh;
 }
 
-.block:hover .sell {
+.block:hover .market-buy {
     display: block;
 }
 

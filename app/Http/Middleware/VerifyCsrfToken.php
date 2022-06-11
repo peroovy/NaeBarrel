@@ -18,6 +18,7 @@ class VerifyCsrfToken extends Middleware
         "api/auth/deleteprofile",
         "api/auth/register",
         "api/market/createlot",
+        "api/market/buy",
         "api/items/sell"
     ];
 }

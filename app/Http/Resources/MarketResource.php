@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Item;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MarketResource extends JsonResource
@@ -16,7 +17,7 @@ class MarketResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'item_id' => $this->item_id,
+            'item' => new ItemResource(Item::whereId($this->item_id)->first()),
             'price' => $this->price,
             'client_id' => $this->client_id
         ];

@@ -21,21 +21,14 @@ function openBarrel(){
         if (response.status === 401) {
             window.location.href = "/login/";
         }
+        if (response.status === 422) {
+            document.querySelector(".actually-drop-size").src = '../pic/fish.png';
+            document.querySelector(".actually-drop-name").textContent = "Не хватает денег!!!";
+        }
         return response.json();
     }).then(data => {
-        console.log(data)
-        let pic = document.querySelector(".actually-drop-size");
-        let name = document.querySelector(".actually-drop-name");
-
-        if ('error_status' in data) {
-            if (data['error_status'] === "NotEnoughMoney") {
-                pic.src = '../pic/fish.png';
-                name.textContent = "Не хватает денег!!!"
-            }
-        } else {
-            document.querySelector(".actually-drop-size").src = data['picture'];
-            name.textContent = data["name"];
-        }
+        document.querySelector(".actually-drop-size").src = data['picture'];
+        document.querySelector(".actually-drop-name").textContent = data["name"];
     });
 
 }

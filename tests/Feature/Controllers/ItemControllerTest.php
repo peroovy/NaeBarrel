@@ -104,6 +104,8 @@ class ItemControllerTest extends TestCase
 
         $this->postJson("api/items", $body, $this->headers)->assertCreated();
         $this->postJson("api/items", $body, $this->headers)->assertStatus(422);
+
+        $this->assert_file_exists();
     }
 
     /**
@@ -186,5 +188,14 @@ class ItemControllerTest extends TestCase
 
         $this->postJson("api/items/sell", ["item_ids" => [$item1_in_inv->id, $item2_in_inv->id]], $headers)
             ->assertStatus(422);
+    }
+
+    private function assert_file_exists()
+    {
+        $path = "public\\uploads\\items\\" . $this->file->hashName();
+
+        \Storage::assertExists($path);
+
+        \Storage::delete($path);
     }
 }

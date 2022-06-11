@@ -63,6 +63,9 @@ body {
 .barrel-size {
     width: 20vh;
     height: auto;
+    background-size: 16vh 10vh;
+    background-position: 2vh 7vh;
+    background-repeat: no-repeat;
 }
 
 .name {
@@ -164,7 +167,7 @@ body {
 
 .simple-barrel {
     width: 50vh;
-    height: auto;
+    height: 30vh;
 }
 
 .open {

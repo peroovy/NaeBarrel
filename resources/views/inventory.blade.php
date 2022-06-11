@@ -14,7 +14,7 @@
         <div class="inv-list"> <!--Тут гуглите Repeat-нотацию для grid--></div>
     </div>
 
-    <div class="openedItem hidden">
+    <div class="openedItem hidden" id="0">
         <div class="closeBarrel" onclick="closeItem()">
             <p class="ok">OK</p>
         </div>
@@ -22,10 +22,10 @@
             <img class="actually-drop-size">
             <p class="actually-drop-name"></p>
         </div>
-        <div class="sell-btn">
+        <div class="sell-btn" onclick="sellItem()">
             <p style="position: absolute; font-size: 5vh; top: 10vh; left: 5vh; margin: 0">продать</p>
         </div>
-        <div class="market-btn" id="0" onclick="putOnMarket()">
+        <div class="market-btn" onclick="putOnMarket()">
             <p style="position: absolute; font-size: 4vh; top: 15vh; left: 3vh; margin: 0">Выставить</p>
         </div>
         <input type="number" class="market-field">

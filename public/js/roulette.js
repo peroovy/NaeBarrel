@@ -33,7 +33,7 @@ function openBarrel(){
                 name.textContent = "Не хватает денег!!!"
             }
         } else {
-            document.querySelector(".actually-drop-size").src = '../pic/fish.png';
+            document.querySelector(".actually-drop-size").src = data['picture'];
             name.textContent = data["name"];
         }
     });
@@ -58,7 +58,7 @@ fetch("/api/cases/" + barrelId, {
     console.log(data);
 
     document.querySelector('.barrel-name').textContent = data['name'];
-    document.querySelector('.simple-barrel').src = '../pic/simple_barrel.png';
+    document.querySelector('.simple-barrel').src = data['picture'];
     document.querySelector('.open').textContent = data['price'];
 
     let dropList = document.querySelector('.drop-list');
@@ -68,7 +68,7 @@ fetch("/api/cases/" + barrelId, {
         drop.classList.add(rarity[item['quality']]);
 
         let img = document.createElement('img');
-        img.src = '../pic/fish.png';
+        img.src = item['picture'];
         img.classList.add('fish-size');
         drop.append(img);
 

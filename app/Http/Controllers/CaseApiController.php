@@ -19,13 +19,11 @@ use Illuminate\Support\Facades\Validator;
 
 class CaseApiController extends Controller
 {
-    private CaseService $service;
-    private ProfileService $profileService;
+    private CaseService $caseService;
 
-    public function __construct(CaseService $service, ProfileService $profileService)
+    public function __construct(CaseService $service)
     {
-        $this->service = $service;
-        $this->profileService = $profileService;
+        $this->caseService = $service;
     }
 
     public function cases() {
@@ -40,10 +38,10 @@ class CaseApiController extends Controller
         $validator = Validator::make($request->all(), [
             "name" => ["required", "string"],
             "description" => ["required", "string"],
-            "price" => ["required", "integer"],
-            "picture" => ["required"],
+            "price" => ["required", "numeric"],
+            "picture" => ["required", "file", "mimes:jpeg,jpg,png"],
             "items" => ["sometimes", "array"],
-            "items.*.id" => ["required", "integer"],
+            "items.*.id" => ["required", "numeric"],
             "items.*.chance" => ["required", "numeric", "gt:0"],
         ]);
 
@@ -53,38 +51,36 @@ class CaseApiController extends Controller
 
         $withItems = array_key_exists("items", $request->all());
 
-        if ($withItems && !$this->service->ValidateItems($request["items"]))
+        if ($withItems && !$this->caseService->validateItems($request["items"]))
             return response(status: 422);
 
-        $case = $this->service->CreateCase(
+        $case = $this->caseService->createCase(
             $request["name"],
             $request["description"],
             $request["price"],
-            $request["picture"],
+            $request->file("picture"),
             $withItems ? $request["items"] : []);
 
         return $case ? new CaseResource($case) : response(status: 400);
     }
 
     public function buy(Request $request) {
-        if (!array_key_exists("case_id", $request->all())) {
-            return response(status: 400);
-        }
-        $case = NBCase::whereId($request["case_id"])->first();
-        if (!$case->exists()) {
-            return response(status: 400);
-        }
+        $validator = Validator::make($request->all(), [
+           "case_id" => ["required", "numeric"]
+        ]);
 
-        $user = Auth::user();
-
-        if (!$this->profileService->DecreaseBalance($user->id, $case->price, TransactionTypes::CaseBuying)) {
-            return response(status: 422);
-        }
-        $item = $this->service->OpenCase($case);
-        if ($item == null) {
+        if ($validator->fails())
             return response(status: 400);
-        }
-        $this->profileService->AddItem($user->id, $item["id"]);
-        return new ItemResource($item);
+
+        $case = $this->caseService->getCase($request["case_id"]);
+        if (!$case)
+            return response(status: 404);
+
+        $item = $this->caseService->tryPlayRoulette(
+            user: Auth::user(),
+            case: $case
+        );
+
+        return $item ? new ItemResource($item) : response(status: 422);
     }
 }

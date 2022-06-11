@@ -55,7 +55,7 @@ class FilterServiceTest extends TestCase
 
             foreach (["id", "login"] as $param)
             {
-                $actual = array_values($this->service->GetFiltered($this->clients, $param, $param)->all());
+                $actual = array_values($this->service->getFiltered($this->clients, $param, $param)->all());
                 $this->assertCount(1, $actual);
                 $this->assertEquals($client["id"], $actual[0]["id"]);
             }
@@ -65,13 +65,13 @@ class FilterServiceTest extends TestCase
     public function test_getting_filtered__get_is_empty()
     {
         $_GET = [];
-        $this->assertEquals($this->clients, $this->service->GetFiltered($this->clients, "id", "id"));
+        $this->assertEquals($this->clients, $this->service->getFiltered($this->clients, "id", "id"));
     }
 
     public function test_getting_filtered__value_does_not_exist()
     {
         $_GET = ["login" => "unknown"];
-        $actual = $this->service->GetFiltered($this->clients, "login", "login")->all();
+        $actual = $this->service->getFiltered($this->clients, "login", "login")->all();
         $this->assertCount(0, $actual);
     }
 
@@ -87,7 +87,7 @@ class FilterServiceTest extends TestCase
                 "login" => "login"
             ];
 
-            $actual = array_values($this->service->ManyFilters($this->clients, $filter)->all());
+            $actual = array_values($this->service->manyFilters($this->clients, $filter)->all());
             $this->assertCount(1, $actual);
             $this->assertEquals($client["id"], $actual[0]["id"]);
         }
@@ -118,7 +118,7 @@ class FilterServiceTest extends TestCase
             "login" => "login"
         ];
 
-        $actual = array_values($this->service->ManyFilters($this->clients, $filter)->all());
+        $actual = array_values($this->service->manyFilters($this->clients, $filter)->all());
         $this->assertCount(0, $actual);
     }
 }

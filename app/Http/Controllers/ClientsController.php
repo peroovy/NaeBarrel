@@ -26,15 +26,15 @@ class ClientsController extends Controller
 
     public function all(): AnonymousResourceCollection
     {
-        $clients = $this->clientService->get_clients();
-        $filtered = $this->filterService->GetFiltered($clients, 'permission_id', 'permission');
+        $clients = $this->clientService->getClients();
+        $filtered = $this->filterService->getFiltered($clients, 'permission_id', 'permission');
 
         return ClientResource::collection($filtered);
     }
 
     public function client(string|int $identifier): Response | ClientResource
     {
-        $client = $this->clientService->get_client_by_identifier($identifier);
+        $client = $this->clientService->getClientByIdentifier($identifier);
 
         if (!$client)
             return response(status: 404);
@@ -44,12 +44,12 @@ class ClientsController extends Controller
 
     public function inventory(string|int $identifier): AnonymousResourceCollection | Response
     {
-        $items = $this->clientService->get_inventory($identifier);
+        $items = $this->clientService->getInventory($identifier);
 
-        if (!$items)
+        if ($items == null)
             return response(status: 404);
 
-        $filtered = $this->filterService->GetFiltered($items, 'quality_id', 'quality');
+        $filtered = $this->filterService->getFiltered($items, 'quality_id', 'quality');
 
         return ItemResource::collection($filtered);
     }

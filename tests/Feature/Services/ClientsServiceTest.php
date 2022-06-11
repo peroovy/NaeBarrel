@@ -66,22 +66,22 @@ class ClientsServiceTest extends TestCase
 
     public function test_getting_clients()
     {
-        foreach ($this->service->get_clients() as $client)
+        foreach ($this->service->getClients() as $client)
             $this->assertEquals(Permissions::User, $client->permission);
     }
 
     public function test_getting_client_by_identifier()
     {
         $this->assertEquals($this->client["id"],
-            $this->service->get_client_by_identifier($this->client->id)["id"]);
+            $this->service->getClientByIdentifier($this->client->id)["id"]);
 
         $this->assertEquals($this->client["id"],
-            $this->service->get_client_by_identifier($this->client->login)["id"]);
+            $this->service->getClientByIdentifier($this->client->login)["id"]);
 
-        $this->assertNull($this->service->get_client_by_identifier($this->admin->id));
-        $this->assertNull($this->service->get_client_by_identifier($this->admin->login));
-        $this->assertNull($this->service->get_client_by_identifier($this->moderator->id));
-        $this->assertNull($this->service->get_client_by_identifier($this->moderator->login));
+        $this->assertNull($this->service->getClientByIdentifier($this->admin->id));
+        $this->assertNull($this->service->getClientByIdentifier($this->admin->login));
+        $this->assertNull($this->service->getClientByIdentifier($this->moderator->id));
+        $this->assertNull($this->service->getClientByIdentifier($this->moderator->login));
     }
 
     public function test_getting_inventory()
@@ -109,8 +109,8 @@ class ClientsServiceTest extends TestCase
         foreach ($items as $item)
             Inventory::create(["client_id" => $this->client->id, "item_id" => $item->id]);
 
-        $actual = $this->service->get_inventory($this->client->id);
-        $this->assertEquals($actual, $this->service->get_inventory($this->client->login));
+        $actual = $this->service->getInventory($this->client->id);
+        $this->assertEquals($actual, $this->service->getInventory($this->client->login));
 
         $this->assertEquals(
             array_map(fn(Item $item) => $item->id, $items),

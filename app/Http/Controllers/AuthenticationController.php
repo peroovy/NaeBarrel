@@ -33,7 +33,7 @@ class AuthenticationController extends Controller
         if ($validator->fails())
             return response(status: 400);
 
-        $is_registered = $this->authenticationService->try_register(
+        $is_registered = $this->authenticationService->tryRegister(
             $request['login'], $request['email'], $request['password'], $request['permission']);
 
         return response(status: $is_registered ? 200 : 422);
@@ -56,7 +56,7 @@ class AuthenticationController extends Controller
 
     public function logout(Request $request)
     {
-        $is_logout = $this->authenticationService->try_logout($request->bearerToken());
+        $is_logout = $this->authenticationService->tryLogout($request->bearerToken());
 
         return response(status: $is_logout ? 200 : 401);
     }

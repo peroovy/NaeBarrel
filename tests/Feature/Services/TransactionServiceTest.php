@@ -66,7 +66,7 @@ class TransactionServiceTest extends TestCase
 
     public function test_getting_all()
     {
-        $actual = $this->service->GetAll()->getQueueableIds();
+        $actual = $this->service->getAll()->getQueueableIds();
 
         $this->assertEquals(
             array_map(fn(Transaction $transaction) => $transaction->id, $this->transactions),
@@ -88,7 +88,7 @@ class TransactionServiceTest extends TestCase
 
     private function assert_getting_all(Builder $where)
     {
-        $actual = array_values($this->service->GetAll()->getDictionary());
+        $actual = array_values($this->service->getAll()->getDictionary());
         $expected = array_values($where->get()->getDictionary());
 
         $this->assertEquals($expected, $actual);

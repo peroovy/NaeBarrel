@@ -18,7 +18,6 @@ class ProfileController extends Controller
 {
     public function __construct(
         private ProfileService $profileService,
-        private ClientsService $clientsService
     )
     {
 
@@ -29,24 +28,17 @@ class ProfileController extends Controller
         return new ClientResource(Auth::user());
     }
 
-    public function inventory(): AnonymousResourceCollection
-    {
-        $items = $this->clientsService->get_inventory(Auth::user()->id);
-
-        return ItemResource::collection($items);
-    }
-
     public function accrue(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'amount' => ['required', 'integer', 'min:1'],
+            'amount' => ['required', 'numeric', 'min:1'],
         ]);
 
         if ($validator->fails())
             return response(status: 400);
 
-        $is_success = $this->profileService->try_accrue(Auth::user(), $request['amount']);
+        $is_success = $this->profileService->tryAccrue(Auth::user(), $request['amount']);
 
-        return response(status: $is_success ? 200 : 500);
+        return response(status: $is_success ? 200 : 422);
     }
 }

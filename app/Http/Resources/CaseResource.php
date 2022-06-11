@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\URL;
 
 class CaseResource extends JsonResource
 {
@@ -19,7 +20,7 @@ class CaseResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'price' => $this->price,
-            'picture' => $this->picture,
+            'picture' => URL::asset($this->picture),
             'items' => ItemResource::collection($this->items())
         ];
     }

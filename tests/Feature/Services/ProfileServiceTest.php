@@ -12,7 +12,9 @@ use App\Models\Permission;
 use App\Models\Quality;
 use App\Models\Transaction;
 use App\Models\TransactionType;
+use App\Services\ClientsService;
 use App\Services\ProfileService;
+use App\Services\TransactionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -20,12 +22,12 @@ use Tests\TestCase;
 class ProfileServiceTest extends TestCase
 {
     private Client $client;
-    private int $balance = 100;
+    private int $balance = 10000;
 
     private Item $common;
     private Item $uncommon;
-    private int $common_count = 2;
-    private int $uncommon_count = 4;
+    private Inventory $common_in_inventory;
+    private Inventory $uncommon_in_inventory;
 
     private ProfileService $service;
 
@@ -35,7 +37,7 @@ class ProfileServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = new ProfileService();
+        $this->service = new ProfileService(new ClientsService(), new TransactionService());
 
         foreach (TransactionTypes::asArray() as $name => $id)
             TransactionType::insert(["id" => $id, "name" => $name]);
@@ -71,28 +73,22 @@ class ProfileServiceTest extends TestCase
             "picture" => "item_2.jpg"
         ]);
 
-        for ($i = 0; $i < $this->common_count; $i++)
-        {
-            Inventory::insert([
-                "client_id" => $this->client->id,
-                "item_id" => $this->common->id
-            ]);
-        }
+        $this->common_in_inventory = Inventory::create([
+            "client_id" => $this->client->id,
+            "item_id" => $this->common->id
+        ]);
 
-        for ($i = 0; $i < $this->uncommon_count; $i++)
-        {
-            Inventory::insert([
-                "client_id" => $this->client->id,
-                "item_id" => $this->uncommon->id
-            ]);
-        }
+        $this->uncommon_in_inventory = Inventory::create([
+            "client_id" => $this->client->id,
+            "item_id" => $this->uncommon->id
+        ]);
     }
 
     public function test_accrue()
     {
         $amount = 1;
         $new_balance = $this->balance + $amount;
-        $this->assertTrue($this->service->try_accrue($this->client, $amount));
+        $this->assertTrue($this->service->tryAccrue($this->client, $amount));
 
         $actual = $this->client->refresh();
         $this->assertEquals($new_balance, $actual->balance);
@@ -108,8 +104,8 @@ class ProfileServiceTest extends TestCase
 
     public function test_accrue__invalid_amount()
     {
-        $this->assertFalse($this->service->try_accrue($this->client, -10));
-        $this->assertFalse($this->service->try_accrue($this->client, 0));
+        $this->assertFalse($this->service->tryAccrue($this->client, -10));
+        $this->assertFalse($this->service->tryAccrue($this->client, 0));
 
         $actual = $this->client->refresh();
         $this->assertEquals($this->balance, $actual->balance);
@@ -121,7 +117,7 @@ class ProfileServiceTest extends TestCase
      */
     public function test_decreasing_balance(int $count)
     {
-        $this->assertTrue($this->service->DecreaseBalance($this->client, $count));
+        $this->assertTrue($this->service->decreaseBalance($this->client->id, $count));
 
         $actual = $this->client->refresh();
         $this->assertEquals($this->balance - $count, $actual->balance);
@@ -129,7 +125,7 @@ class ProfileServiceTest extends TestCase
 
     public function get_correct_decreased_counts(): array
     {
-        return array([1, $this->balance - 1, $this->balance]);
+        return array([1], [$this->balance - 1], [$this->balance]);
     }
 
     /**
@@ -137,7 +133,7 @@ class ProfileServiceTest extends TestCase
      */
     public function test_decreasing_balance__bad_count(int $count)
     {
-        $this->assertFalse($this->service->DecreaseBalance($this->client, $count));
+        $this->assertFalse($this->service->decreaseBalance($this->client->id, $count));
 
         $actual = $this->client->refresh();
         $this->assertEquals($this->balance, $actual->balance);
@@ -145,7 +141,7 @@ class ProfileServiceTest extends TestCase
 
     public function get_bad_decreased_counts(): array
     {
-        return array([-10, -1, 0, $this->balance + 1, 2 * $this->balance]);
+        return array([-10], [-1], [0], [$this->balance + 1], [2 * $this->balance]);
     }
 
     /**
@@ -153,7 +149,7 @@ class ProfileServiceTest extends TestCase
      */
     public function test_increasing_balance(int $count)
     {
-        $this->assertTrue($this->service->IncreaseBalance($this->client, $count));
+        $this->assertTrue($this->service->increaseBalance($this->client->id, $count));
 
         $actual = $this->client->refresh();
         $this->assertEquals($this->balance + $count, $actual->balance);
@@ -161,7 +157,7 @@ class ProfileServiceTest extends TestCase
 
     public function get_correct_increased_counts(): array
     {
-        return array([1, 10, $this->balance, 3 * $this->balance]);
+        return array([1], [10], [$this->balance], [3 * $this->balance]);
     }
 
     /**
@@ -169,7 +165,7 @@ class ProfileServiceTest extends TestCase
      */
     public function test_increasing_balance__bad_count(int $count)
     {
-        $this->assertFalse($this->service->IncreaseBalance($this->client, $count));
+        $this->assertFalse($this->service->increaseBalance($this->client, $count));
 
         $actual = $this->client->refresh();
         $this->assertEquals($this->balance, $actual->balance);
@@ -177,47 +173,33 @@ class ProfileServiceTest extends TestCase
 
     public function get_bad_increased_counts(): array
     {
-        return array([-1, -10, -$this->balance, -3 * $this->balance, 0]);
+        return array([-1], [-10], [-$this->balance], [-3 * $this->balance], [0]);
     }
 
-    /**
-     * @dataProvider get_common_and_uncommon_counts
-     */
-    public function test_selling_items(int $common_count, int $uncommon_count)
+    public function test_selling_items()
     {
-        $expected_coins = min($this->common_count, $common_count) * $this->common->price
-            + min($this->uncommon_count, $uncommon_count) * $this->uncommon->price;
+        $expected_coins = $this->common->price + $this->uncommon->price;
+        $expected_balance = $this->client->balance + $expected_coins;
 
-        $ids = array_merge(array_fill(0, $common_count, $this->common->id),
-            array_fill(0, $uncommon_count, $this->uncommon->id));
+        $coins = $this->service->sellItems($this->client->id, [$this->common->id, $this->uncommon->id]);
 
-        $actual_coins = $this->service->SellItems($this->client, $ids);
-        $this->assertEquals($expected_coins, $actual_coins);
+        $this->client->refresh();
 
-        $actual = $this->client->refresh();
-        $this->assertEquals($this->balance + $expected_coins, $actual->balance);
+        $this->assertEquals($expected_coins, $coins);
+        $this->assertEquals($expected_balance, $this->client->balance);
 
-        $this->assertTrue(Transaction::where("client_id", "=", $this->client->id)
-            ->where("accrual", "=", $expected_coins)
-            ->where("type", "=", TransactionTypes::Sale)
-            ->exists()
-        );
-    }
+        foreach ([$this->common, $this->uncommon] as $item)
+        {
+            $this->assertDatabaseMissing(Inventory::class, [
+                "client_id" => $this->client->id,
+                "item_id" => $item->id
+            ]);
+        }
 
-    public function get_common_and_uncommon_counts(): array
-    {
-        return array(
-            [$this->common_count, $this->uncommon_count],
-            [$this->common_count, 0],
-            [0, $this->uncommon_count],
-            [$this->common_count - 1, 0],
-            [0, $this->uncommon_count - 1],
-            [2 * $this->common_count, $this->uncommon_count],
-            [2 * $this->common_count, 2 * $this->uncommon_count],
-            [1, 1],
-            [1, $this->uncommon_count - 1],
-            [$this->common_count - 1, 1],
-            [0, 0],
-        );
+        $this->assertDatabaseHas(Transaction::class, [
+            "client_id" => $this->client->id,
+            "type" => TransactionTypes::Sale,
+            "accrual" => $expected_coins
+        ]);
     }
 }

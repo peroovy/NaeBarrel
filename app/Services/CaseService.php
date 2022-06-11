@@ -2,27 +2,44 @@
 
 namespace App\Services;
 
-use App\Http\Resources\ItemResource;
+use App\Enums\TransactionTypes;
 use App\Models\CaseItem;
 use App\Models\Client;
 use App\Models\Item;
 use App\Models\NBCase;
-use http\Exception\UnexpectedValueException;
+use Exception;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class CaseService
 {
+    private string $path = "uploads/cases";
+
     public static $EPS = 10 ** -10;
 
-    public function CaseExists(string $name): bool
+    public function __construct(
+        private ProfileService $profileService,
+        private TransactionService $transactionService,
+        private FileService $fileService,
+    ) {}
+
+    public function getCase(int $id): NBCase|null
+    {
+        return NBCase::whereId($id)->first();
+    }
+
+    public function caseExists(string $name): bool
     {
         return NBCase::where([["name", "=", $name]])->exists();
     }
 
-    public function CreateCase(string $name, string $description, int $price, string $picture, array $items): NBCase|null
+    public function createCase(string $name, string $description, int $price, UploadedFile $picture, array $items): NBCase|null
     {
-        if ($this->CaseExists($name))
+        if ($this->caseExists($name))
             return null;
+
+        $uri = $this->fileService->upload($picture, "cases");
 
         DB::beginTransaction();
         try
@@ -31,12 +48,12 @@ class CaseService
                 'name' => $name,
                 'description' => $description,
                 'price' => $price,
-                'picture' => $picture
+                'picture' => $uri
             ]);
 
             $case_items = [];
             foreach ($items as $item) {
-                $case_items[] =[
+                $case_items[] = [
                     "case_id" => $case->id,
                     "item_id" => $item["id"],
                     "chance" => $item["chance"]
@@ -54,7 +71,43 @@ class CaseService
         }
     }
 
-    public function OpenCase(NBCase $case) {
+    public function tryPlayRoulette(Client $user, NBCase $case): Item | null
+    {
+        DB::beginTransaction();
+        try
+        {
+            if (!$this->profileService->decreaseBalance($user->id, $case->price)
+                || !($item = $this->openCase($case)))
+            {
+                throw new Exception();
+            }
+
+            $this->profileService->addItem($user->id, $item["id"]);
+
+            $this->transactionService->declare($user->id, $case->price, TransactionTypes::CaseBuying);
+
+            DB::commit();
+            return $item;
+        }
+        catch (Exception $exception)
+        {
+            DB::rollBack();
+            return null;
+        }
+    }
+
+    public function validateItems(array $items): bool
+    {
+        if (count($items) == 0)
+            return true;
+
+        $ids = array_map(fn (array $item) => $item["id"], $items);
+        $probability = array_sum(array_map(fn (array $item) => $item["chance"], $items));
+
+        return count($ids) == Item::findMany($ids)->count() && abs($probability - 1) < self::$EPS;
+    }
+
+    private function openCase(NBCase $case) {
         $items = $case->items();
         if (count($items) == 0) {
             return null;
@@ -67,17 +120,7 @@ class CaseService
                 return $item;
             }
         }
+
         return $items->last();
-    }
-
-    public function ValidateItems(array $items): bool
-    {
-        if (count($items) == 0)
-            return true;
-
-        $ids = array_map(fn (array $item) => $item["id"], $items);
-        $probability = array_sum(array_map(fn (array $item) => $item["chance"], $items));
-
-        return count($ids) == Item::findMany($ids)->count() && abs($probability - 1) < self::$EPS;
     }
 }

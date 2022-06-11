@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Qualities;
 use App\Http\Resources\ItemResource;
 use App\Models\Inventory;
 use App\Models\Item;
@@ -9,6 +10,7 @@ use App\Models\Quality;
 use App\Services\ClientsService;
 use App\Services\ItemService;
 use App\Services\ProfileService;
+use BenSampo\Enum\Rules\EnumValue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -25,7 +27,7 @@ class ItemApiController extends Controller
     }
 
     public function items() {
-        return ItemResource::collection($this->service->GetAll());
+        return ItemResource::collection($this->service->get());
     }
 
     public function index(Item $item_id) {
@@ -34,34 +36,39 @@ class ItemApiController extends Controller
 
     public function create(Request $request) {
         $validator = Validator::make($request->all(), [
-            "name" => ["required"],
-            "description" => ["required"],
-            "price" => ["required"],
-            "picture" => ["required"],
-            "quality" => ["sometimes"]
+            "name" => ["required", "string"],
+            "description" => ["required", "string"],
+            "price" => ["required", "numeric"],
+            "picture" => ["required", "file", "mimes:jpeg,jpg,png"],
+            "quality" => ["sometimes", new EnumValue(Qualities::class, false)]
         ]);
         if ($validator->fails()) {
             return response(status: 400);
         }
-        $item = $this->service->CreateItem(
+        $item = $this->service->create(
             $request["name"],
             $request["description"],
             $request["price"],
             $request["quality"],
-            $request["picture"]
+            $request->file("picture")
         );
         if ($item) {
             return new ItemResource($item);
         }
-        return response(status: 400);
+        return response(status: 422);
     }
 
     public function sell(Request $request) {
-        if (!array_key_exists("item_ids", $request->all())) {
-            return response(status: 400);
-        }
-        $profit = $this->profileService->SellItems(Auth::user()->id, $request["item_ids"]);
+        $validator = Validator::make($request->all(), [
+            "item_ids" => ["required", "array"],
+            "item_ids.*" => ["numeric"]
+        ]);
 
-        return $profit;
+        if ($validator->fails())
+            return response(status: 400);
+
+        $coins = $this->profileService->sellItems(Auth::user()->id, $request["item_ids"]);
+
+        return $coins != null ? ["coins" => $coins] : response(status: 422);
     }
 }

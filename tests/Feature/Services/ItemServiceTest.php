@@ -5,15 +5,19 @@ namespace Tests\Feature;
 use App\Enums\Qualities;
 use App\Models\Item;
 use App\Models\Quality;
+use App\Services\FileService;
 use App\Services\ItemService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class ItemServiceTest extends TestCase
 {
     private Item $common;
     private Item $uncommon;
+
+    private UploadedFile $file;
 
     private ItemService $service;
 
@@ -23,7 +27,8 @@ class ItemServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = new ItemService();
+        $this->file = UploadedFile::fake()->create("test.png");
+        $this->service = new ItemService(new FileService());
         $_GET = [];
 
         foreach (Qualities::asArray() as $name => $id)
@@ -47,7 +52,7 @@ class ItemServiceTest extends TestCase
 
     public function test_getting_all()
     {
-        $actual = $this->service->GetAll();
+        $actual = $this->service->get();
 
         $this->assertEquals(Item::all(), $actual);
     }
@@ -57,7 +62,7 @@ class ItemServiceTest extends TestCase
         foreach ([Qualities::Common => $this->common, Qualities::Uncommon => $this->uncommon] as $value => $obj)
         {
             $_GET["quality"] = $value;
-            $actual = $this->service->GetAll()->values();
+            $actual = $this->service->get()->values();
             $this->assertCount(1, $actual);
             $this->assertEquals($obj["id"], $actual[0]["id"]);
         }
@@ -66,40 +71,51 @@ class ItemServiceTest extends TestCase
     public function test_getting_all__bad_filtering()
     {
         $_GET["quality"] = -1;
-        $this->assertCount(0, $this->service->GetAll());
+        $this->assertCount(0, $this->service->get());
     }
 
     public function test_existing_item()
     {
-        $this->assertTrue($this->service->ItemExists($this->common->name));
-        $this->assertTrue($this->service->ItemExists($this->uncommon->name));
-        $this->assertFalse($this->service->ItemExists("unknown"));
+        $this->assertTrue($this->service->exists($this->common->name));
+        $this->assertTrue($this->service->exists($this->uncommon->name));
+        $this->assertFalse($this->service->exists("unknown"));
     }
 
     public function test_creating_item()
     {
-        $item = new Item([
+        $item = [
             "name" => "top",
             "description" => "desc",
             "price" => 10,
             "quality" => Qualities::Common,
-            "picture" => "123.jpg"
-        ]);
+            "picture" => $this->file
+        ];
 
-        $actual = $this->service->CreateItem(...$item->getAttributes());
+        $actual = $this->service->create(...$item);
 
         $this->assertInstanceOf(Item::class, $actual);
-        $this->assertEquals($item->description, $actual->description);
-        $this->assertEquals($item->price, $actual->price);
-        $this->assertEquals($item->quality, $actual->quality);
-        $this->assertEquals($item->picture, $actual->picture);
-        $this->assertDatabaseHas(Item::class, $item->getAttributes());
+        $this->assertEquals($item["description"], $actual->description);
+        $this->assertEquals($item["price"], $actual->price);
+        $this->assertEquals($item["quality"], $actual->quality);
+        $this->assertDatabaseHas(Item::class, ["name" => $item["name"]]);
+
+        $this->assert_file_exists();
     }
 
     public function test_creating_item__name_does_exist()
     {
         $attr = $this->common->getAttributes();
         unset($attr["id"]);
-        $this->assertNull($this->service->CreateItem(...$attr));
+        $attr["picture"] = $this->file;
+        $this->assertNull($this->service->create(...$attr, ));
+    }
+
+    private function assert_file_exists()
+    {
+        $path = "public\\uploads\\items\\" . $this->file->hashName();
+
+        \Storage::assertExists($path);
+
+        \Storage::delete($path);
     }
 }

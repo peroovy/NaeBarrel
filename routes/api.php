@@ -72,7 +72,6 @@ Route::middleware('auth:sanctum')->group(function ()
     Route::prefix('profile')->group(function ()
     {
         Route::get('', [ProfileController::class, 'profile']);
-        Route::get('/inventory', [ProfileController::class, 'inventory']);
         Route::post('/accrue', [ProfileController::class, 'accrue']);
     });
 

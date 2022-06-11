@@ -9,7 +9,7 @@ class FileService
 {
     public function upload(UploadedFile $file, string ...$folders): string
     {
-        $upload_to = "uploads\\" . join("\\", $folders);
+        $upload_to = "uploads/" . join("/", $folders);
 
         $file->store($upload_to, "public");
 

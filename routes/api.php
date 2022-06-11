@@ -48,6 +48,8 @@ Route::get('/cases/{case_id}', [CaseApiController::class, "index"]);
 
 Route::middleware('auth:sanctum')->group(function ()
 {
+    Route::post('/auth/deleteprofile', [AuthenticationController::class, 'DeleteProfile']);
+
     Route::prefix('cases')->group(function () {
         Route::post('', [CaseApiController::class, 'create'])->middleware("moderator");
         Route::post('/buy', [CaseApiController::class, 'buy']);

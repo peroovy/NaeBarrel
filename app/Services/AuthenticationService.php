@@ -36,7 +36,8 @@ class AuthenticationService
 
     public function authenticate(string $email, string $password): string | null
     {
-        if (!Auth::attempt(['email' => $email, 'password' => $password]))
+        $client = Client::whereEmail($email);
+        if (!$client->exists() || $client->first()['dead'] || !Auth::attempt(['email' => $email, 'password' => $password]))
             return null;
 
         $user = Auth::user();

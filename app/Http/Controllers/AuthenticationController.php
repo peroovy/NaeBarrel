@@ -4,17 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Enums\Permissions;
 use App\Services\AuthenticationService;
+use App\Services\ProfileService;
 use BenSampo\Enum\Rules\EnumValue;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class AuthenticationController extends Controller
 {
     private AuthenticationService $authenticationService;
+    private ProfileService $profileService;
 
-    public function __construct(AuthenticationService $authorizationService)
+    public function __construct(AuthenticationService $authorizationService, ProfileService $profileService)
     {
         $this->authenticationService = $authorizationService;
+        $this->profileService = $profileService;
     }
 
     public function register(Request $request)
@@ -55,5 +59,11 @@ class AuthenticationController extends Controller
         $is_logout = $this->authenticationService->try_logout($request->bearerToken());
 
         return response(status: $is_logout ? 200 : 401);
+    }
+
+    public function DeleteProfile(Request $request) {
+        $id = Auth::user()->id;
+        $this->logout($request);
+        return $this->profileService->DeleteProfile($id);
     }
 }

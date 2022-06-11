@@ -92,4 +92,11 @@ class ProfileService
         $this->IncreaseBalance($identifier, $coins, TransactionTypes::Sale);
         return $coins;
     }
+
+    public function DeleteProfile(string|int $identifier) {
+        $client = $this->clientsService->get_client_by_identifier($identifier);
+        $client->dead = true;
+        $client->save();
+        return response(status: 200);
+    }
 }

@@ -14,9 +14,13 @@ use App\Models\Quality;
 use App\Models\TransactionType;
 use App\Services\CaseService;
 use App\Services\ClientsService;
+use App\Services\FileService;
 use App\Services\ProfileService;
 use App\Services\TransactionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use phpmock\Mock;
 use phpmock\MockBuilder;
 use Tests\TestCase;
@@ -28,22 +32,24 @@ class CaseServiceTest extends TestCase
     private NBCase $case;
     private NBCase $unsaved_case;
     private Client $client;
+    private UploadedFile $file;
 
     /** @var Item[] */
     private array $items;
 
     use RefreshDatabase;
 
-    public function __construct(?string $name = null, array $data = [], $dataName = '')
-    {
-        $this->service = new CaseService(new ProfileService(new ClientsService(), new TransactionService()), new TransactionService());
-
-        parent::__construct($name, $data, $dataName);
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->service = new CaseService(
+            new ProfileService(new ClientsService(), new TransactionService()),
+            new TransactionService(),
+            new FileService()
+        );
+
+        $this->file = UploadedFile::fake()->create("test.png");
 
         foreach (Permissions::asArray() as $name => $id)
             Permission::insert(["id" => $id, "name" => $name]);
@@ -63,7 +69,7 @@ class CaseServiceTest extends TestCase
             "name" => "case",
             "description" => "desc",
             "price" => 10,
-            "picture" => "123.jpg",
+            "picture" => $this->file,
         ]);
 
         foreach (Qualities::asArray() as $name => $id)
@@ -74,21 +80,21 @@ class CaseServiceTest extends TestCase
                 "description" => "item_1_description",
                 "price" => 100,
                 "quality" => Qualities::Common,
-                "picture" => "item_1.jpg"
+                "picture" => $this->file
         ]);
         $this->items[] = Item::create([
                 "name" => "item_2",
                 "description" => "item_2_description",
                 "price" => 50,
                 "quality" => Qualities::Uncommon,
-                "picture" => "item_2.jpg"
+                "picture" => $this->file
         ]);
 
         $this->unsaved_case = new NBCase([
             "name" => "joke",
             "description" => "desc",
             "price" => 20,
-            "picture" => "234.jpg"
+            "picture" => $this->file
         ]);
     }
 
@@ -100,7 +106,7 @@ class CaseServiceTest extends TestCase
 
     public function test_creating_case__name_already_exists()
     {
-        $actual = $this->service->createCase($this->case->name, "another", 10, "345.jpg", []);
+        $actual = $this->service->createCase($this->case->name, "another", 10, $this->file, []);
 
         $this->assertNull($actual);
     }
@@ -113,7 +119,7 @@ class CaseServiceTest extends TestCase
             $expected->name,
             $expected->description,
             $expected->price,
-            $expected->picture,
+            $this->file,
             items: []
         );
 
@@ -129,7 +135,7 @@ class CaseServiceTest extends TestCase
         foreach ($this->items as $item)
             $case_items[] = ["id" => $item->id, "chance" => $chance];
 
-        $actual = $this->service->createCase($expected->name, $expected->description, $expected->price, $expected->picture, $case_items);
+        $actual = $this->service->createCase($expected->name, $expected->description, $expected->price, $this->file, $case_items);
 
         $this->assert_creating_case($expected, $actual);
 
@@ -196,6 +202,16 @@ class CaseServiceTest extends TestCase
         $this->assertEquals($expected->name, $actual->name);
         $this->assertEquals($expected->description, $actual->description);
         $this->assertEquals($expected->price, $actual->price);
-        $this->assertEquals($expected->picture, $actual->picture);
+
+        $this->assert_file_exists();
+    }
+
+    private function assert_file_exists()
+    {
+        $path = "public\\uploads\\cases\\" . $this->file->hashName();
+
+        \Storage::assertExists($path);
+
+        \Storage::delete($path);
     }
 }

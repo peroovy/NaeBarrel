@@ -18,6 +18,8 @@ use App\Services\AuthenticationService;
 use App\Services\CaseService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Illuminate\Testing\Fluent\Concerns\Matching;
 use Tests\TestCase;
@@ -37,6 +39,8 @@ class CaseControllerTest extends TestCase
     private Client $client;
     private array $client_headers;
 
+    private UploadedFile $file;
+
     private Client $admin;
     private array $admin_headers;
 
@@ -45,6 +49,8 @@ class CaseControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->file = UploadedFile::fake()->create("test.png");
 
         foreach (Permissions::asArray() as $name => $id)
             Permission::insert(["id" => $id, "name" => $name]);
@@ -82,7 +88,7 @@ class CaseControllerTest extends TestCase
             "description" => "description",
             "price" => 10,
             "quality" => Qualities::Common,
-            "picture" => "item.jpg"
+            "picture" => $this->file
         ]);
 
         $this->item2 = Item::create([
@@ -90,14 +96,14 @@ class CaseControllerTest extends TestCase
             "description" => "description2",
             "price" => 30,
             "quality" => Qualities::Uncommon,
-            "picture" => "item.2jpg"
+            "picture" => $this->file
         ]);
 
         $this->cases[] = $this->case = NBCase::create([
             "name" => "case1",
             "description" => "desc1",
             "price" => 100,
-            "picture" => "pic1.jpg",
+            "picture" => $this->file,
         ]);
 
         CaseItem::insert(["case_id" => $this->case->id, "item_id" => $this->item_in_case->id, "chance" => 1]);
@@ -106,7 +112,7 @@ class CaseControllerTest extends TestCase
             "name" => "case2",
             "description" => "desc2",
             "price" => 20,
-            "picture" => "pic2.jpg",
+            "picture" => $this->file,
         ]);
     }
 
@@ -145,27 +151,31 @@ class CaseControllerTest extends TestCase
 
         if ($body)
             $this->assertDatabaseMissing(NBCase::class, $body);
+
+        unlink($this->file->path());
     }
 
     public function provide_bad_creating_bodies(): array
     {
+        $file = UploadedFile::fake()->create("test.png");
+
         return array(
           [["name" => "123"]],
           [["description" => "123"]],
           [["price" => 123]],
           [["picture" => "1.jpg"]],
           [["items" => []]],
-          [["name" => 123, "description" => "desc", "price" => 123, "picture" => "1.jpg", "items" => []]],
-          [["name" => null, "description" => "desc", "price" => 123, "picture" => "1.jpg", "items" => []]],
-          [["name" => "123", "description" => 123, "price" => 123, "picture" => "1.jpg", "items" => []]],
-          [["name" => "123", "description" => null, "price" => 123, "picture" => "1.jpg", "items" => []]],
-          [["name" => "123", "description" => "desc", "price" => null, "picture" => "1.jpg", "items" => []]],
+          [["name" => 123, "description" => "desc", "price" => 123, "picture" => $file, "items" => []]],
+          [["name" => null, "description" => "desc", "price" => 123, "picture" => $file, "items" => []]],
+          [["name" => "123", "description" => 123, "price" => 123, "picture" => $file, "items" => []]],
+          [["name" => "123", "description" => null, "price" => 123, "picture" => $file, "items" => []]],
+          [["name" => "123", "description" => "desc", "price" => null, "picture" => $file, "items" => []]],
           [["name" => "123", "description" => "desc", "price" => 123, "picture" => null, "items" => []]],
-          [["name" => "123", "description" => "desc", "price" => 123, "picture" => "null.jpg", "items" => 123]],
-          [["name" => "123", "description" => "desc", "price" => 123, "picture" => "null.jpg", "items" => "123"]],
-          [["name" => "123", "description" => "desc", "price" => 123, "picture" => "null.jpg", "items" => null]],
-          [["name" => "123", "description" => "desc", "price" => 123, "picture" => "null.jpg", "items" => [["id" => 1]]]],
-          [["name" => "123", "description" => "desc", "price" => 123, "picture" => "null.jpg", "items" => [["chance" => 1.2]]]],
+          [["name" => "123", "description" => "desc", "price" => 123, "picture" => $file, "items" => 123]],
+          [["name" => "123", "description" => "desc", "price" => 123, "picture" => $file, "items" => "123"]],
+          [["name" => "123", "description" => "desc", "price" => 123, "picture" => $file, "items" => null]],
+          [["name" => "123", "description" => "desc", "price" => 123, "picture" => $file, "items" => [["id" => 1]]]],
+          [["name" => "123", "description" => "desc", "price" => 123, "picture" => $file, "items" => [["chance" => 1.2]]]],
         );
     }
 
@@ -175,7 +185,7 @@ class CaseControllerTest extends TestCase
             "name" => $this->case->name,
             "description" => "desc",
             "price" => 123,
-            "picture" => "null.jpg",
+            "picture" => $this->file,
             "items" => []
         ];
 
@@ -215,7 +225,7 @@ class CaseControllerTest extends TestCase
                 "name" => "1",
                 "description" => "1",
                 "price" => 1000,
-                "picture" => "1.jpg",
+                "picture" => $this->file,
                 "items" => $items
             ];
 
@@ -229,12 +239,13 @@ class CaseControllerTest extends TestCase
             "name" => "1",
             "description" => "1",
             "price" => 1000,
-            "picture" => "1.jpg",
+            "picture" => $this->file,
             "items" => []
         ];
 
         $this->postJson("api/cases", $body, $this->admin_headers)->assertCreated();
         $this->assertDatabaseHas(NBCase::class, ["name" => $body["name"]]);
+        $this->assert_file_exists();
     }
 
     public function test_creating_case_with_items()
@@ -243,7 +254,7 @@ class CaseControllerTest extends TestCase
             "name" => "1",
             "description" => "1",
             "price" => 1000,
-            "picture" => "1.jpg",
+            "picture" => $this->file,
             "items" => [
                 ["id" => $this->item_in_case->id, "chance" => 0.25],
                 ["id" => $this->item2->id, "chance" => 0.75],
@@ -263,6 +274,7 @@ class CaseControllerTest extends TestCase
                 "chance" => $item["chance"]
             ]);
         }
+        $this->assert_file_exists();
     }
 
     /**
@@ -315,7 +327,7 @@ class CaseControllerTest extends TestCase
                     ->where("description", $this->item_in_case->description)
                     ->where("price", $this->item_in_case->price)
                     ->where("quality", $this->item_in_case->quality)
-                    ->where("picture", $this->item_in_case->picture)
+                    ->where("picture", URL::asset($this->item_in_case->picture))
                     ->etc();
             });
 
@@ -339,8 +351,18 @@ class CaseControllerTest extends TestCase
                 ->where("description", $this->item_in_case->description)
                 ->where("price", $this->item_in_case->price)
                 ->where("quality", $this->item_in_case->quality)
-                ->where("picture", $this->item_in_case->picture)
+                ->where("picture", URL::asset($this->item_in_case->picture))
                 ->etc()
-            );
+            )
+            ->where("picture", URL::asset($this->case->picture));
+    }
+
+    private function assert_file_exists()
+    {
+        $path = "public\\uploads\\cases\\" . $this->file->hashName();
+
+        \Storage::assertExists($path);
+
+        \Storage::delete($path);
     }
 }

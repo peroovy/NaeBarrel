@@ -5,15 +5,19 @@ namespace Tests\Feature;
 use App\Enums\Qualities;
 use App\Models\Item;
 use App\Models\Quality;
+use App\Services\FileService;
 use App\Services\ItemService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class ItemServiceTest extends TestCase
 {
     private Item $common;
     private Item $uncommon;
+
+    private UploadedFile $file;
 
     private ItemService $service;
 
@@ -23,7 +27,8 @@ class ItemServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = new ItemService();
+        $this->file = UploadedFile::fake()->create("test.png");
+        $this->service = new ItemService(new FileService());
         $_GET = [];
 
         foreach (Qualities::asArray() as $name => $id)
@@ -78,28 +83,39 @@ class ItemServiceTest extends TestCase
 
     public function test_creating_item()
     {
-        $item = new Item([
+        $item = [
             "name" => "top",
             "description" => "desc",
             "price" => 10,
             "quality" => Qualities::Common,
-            "picture" => "123.jpg"
-        ]);
+            "picture" => $this->file
+        ];
 
-        $actual = $this->service->create(...$item->getAttributes());
+        $actual = $this->service->create(...$item);
 
         $this->assertInstanceOf(Item::class, $actual);
-        $this->assertEquals($item->description, $actual->description);
-        $this->assertEquals($item->price, $actual->price);
-        $this->assertEquals($item->quality, $actual->quality);
-        $this->assertEquals($item->picture, $actual->picture);
-        $this->assertDatabaseHas(Item::class, $item->getAttributes());
+        $this->assertEquals($item["description"], $actual->description);
+        $this->assertEquals($item["price"], $actual->price);
+        $this->assertEquals($item["quality"], $actual->quality);
+        $this->assertDatabaseHas(Item::class, ["name" => $item["name"]]);
+
+        $this->assert_file_exists();
     }
 
     public function test_creating_item__name_does_exist()
     {
         $attr = $this->common->getAttributes();
         unset($attr["id"]);
-        $this->assertNull($this->service->create(...$attr));
+        $attr["picture"] = $this->file;
+        $this->assertNull($this->service->create(...$attr, ));
+    }
+
+    private function assert_file_exists()
+    {
+        $path = "public\\uploads\\items\\" . $this->file->hashName();
+
+        \Storage::assertExists($path);
+
+        \Storage::delete($path);
     }
 }

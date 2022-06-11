@@ -14,6 +14,7 @@ use App\Models\TransactionType;
 use App\Services\AuthenticationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
@@ -22,11 +23,16 @@ class ItemControllerTest extends TestCase
     private Client $moder;
     private array $headers;
 
+    private UploadedFile $file;
+
     use RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->file = UploadedFile::fake()->create("test.png");
+
 
         foreach (Qualities::asArray() as $name => $id)
             Quality::insert(["id" => $id, "name" => $name]);
@@ -93,7 +99,7 @@ class ItemControllerTest extends TestCase
             "description" => "a",
             "price" => 1,
             "quality" => Qualities::Common,
-            "picture" => "1.jpg"
+            "picture" => $this->file
         ];
 
         $this->postJson("api/items", $body, $this->headers)->assertCreated();
@@ -154,7 +160,7 @@ class ItemControllerTest extends TestCase
             "description" => "description2",
             "price" => 30,
             "quality" => Qualities::Uncommon,
-            "picture" => "item.2jpg"
+            "picture" => $this->file
         ]);
 
         $item2 = Item::create([

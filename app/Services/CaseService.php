@@ -8,15 +8,20 @@ use App\Models\Client;
 use App\Models\Item;
 use App\Models\NBCase;
 use Exception;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class CaseService
 {
+    private string $path = "uploads/cases";
+
     public static $EPS = 10 ** -10;
 
     public function __construct(
         private ProfileService $profileService,
-        private TransactionService $transactionService
+        private TransactionService $transactionService,
+        private FileService $fileService,
     ) {}
 
     public function getCase(int $id): NBCase|null
@@ -29,10 +34,12 @@ class CaseService
         return NBCase::where([["name", "=", $name]])->exists();
     }
 
-    public function createCase(string $name, string $description, int $price, string $picture, array $items): NBCase|null
+    public function createCase(string $name, string $description, int $price, UploadedFile $picture, array $items): NBCase|null
     {
         if ($this->caseExists($name))
             return null;
+
+        $uri = $this->fileService->upload($picture, "cases");
 
         DB::beginTransaction();
         try
@@ -41,7 +48,7 @@ class CaseService
                 'name' => $name,
                 'description' => $description,
                 'price' => $price,
-                'picture' => $picture
+                'picture' => $uri
             ]);
 
             $case_items = [];

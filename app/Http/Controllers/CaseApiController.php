@@ -39,7 +39,7 @@ class CaseApiController extends Controller
             "name" => ["required", "string"],
             "description" => ["required", "string"],
             "price" => ["required", "numeric"],
-            "picture" => ["required"],
+            "picture" => ["required", "file", "mimes:jpeg,jpg,png"],
             "items" => ["sometimes", "array"],
             "items.*.id" => ["required", "numeric"],
             "items.*.chance" => ["required", "numeric", "gt:0"],
@@ -58,7 +58,7 @@ class CaseApiController extends Controller
             $request["name"],
             $request["description"],
             $request["price"],
-            $request["picture"],
+            $request->file("picture"),
             $withItems ? $request["items"] : []);
 
         return $case ? new CaseResource($case) : response(status: 400);

@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\URL;
 
 class ItemResource extends JsonResource
 {
@@ -20,7 +21,7 @@ class ItemResource extends JsonResource
             'description' => $this->description,
             'price' => $this->price,
             'quality' => $this->quality,
-            'picture' => $this->picture,
+            'picture' => URL::asset($this->picture),
             'chance' => $this->chance,
             'inv_id' => $this->inv_id
         ];

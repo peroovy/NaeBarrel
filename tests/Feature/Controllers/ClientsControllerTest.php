@@ -146,7 +146,6 @@ class ClientsControllerTest extends TestCase
             ->where("description", $this->item->description)
             ->where("price", $this->item->price)
             ->where("quality", $this->item->quality)
-            ->where("picture", $this->item->picture)
             ->etc();
     }
 }

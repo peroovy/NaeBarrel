@@ -39,8 +39,8 @@ class ItemApiController extends Controller
             "name" => ["required", "string"],
             "description" => ["required", "string"],
             "price" => ["required", "numeric"],
-            "picture" => ["required"],
-            "quality" => ["sometimes", new EnumValue(Qualities::class)]
+            "picture" => ["required", "file", "mimes:jpeg,jpg,png"],
+            "quality" => ["sometimes", new EnumValue(Qualities::class, false)]
         ]);
         if ($validator->fails()) {
             return response(status: 400);
@@ -50,7 +50,7 @@ class ItemApiController extends Controller
             $request["description"],
             $request["price"],
             $request["quality"],
-            $request["picture"]
+            $request->file("picture")
         );
         if ($item) {
             return new ItemResource($item);

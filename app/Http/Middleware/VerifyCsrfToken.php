@@ -15,6 +15,8 @@ class VerifyCsrfToken extends Middleware
         "api/cases/buy",
         "api/auth/login",
         "api/auth/logout",
+        "api/auth/deleteprofile",
+        "api/auth/register",
         "api/market/createlot",
         "api/items/sell"
     ];

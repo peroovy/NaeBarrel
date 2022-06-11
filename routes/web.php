@@ -36,6 +36,14 @@ Route::get('/logout', function () {
     return view('logout');
 });
 
+Route::get('/deleteprofile', function () {
+    return view('delete');
+});
+
+Route::get('/register', function () {
+    return view('register');
+});
+
 Route::get('/profile/{login}', function ($login=false) {
     return view('inventory', ["login" => $login]);
 });

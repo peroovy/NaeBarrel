@@ -7,8 +7,8 @@
 </head>
 <body>
 
-<button class="submit" onclick="deleteProfile()" style="width: 12vh; height: 3vh">Удалить аккаунт</button>
+<button class="submit" onclick="deleteProfile()" style="width: 15vh; height: 3vh">Удалить аккаунт</button>
 
-<script src="{{URL::asset('js/delete.js')}}"></script>
+<script src="{{URL::asset('js/auth.js')}}"></script>
 </body>
 </html>

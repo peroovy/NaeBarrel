@@ -54,8 +54,8 @@ fetch("/api/market/", {
                 }).then(data => {
                     if ('error_status' in data) {
                         if (data['error_status'] === "NotEnoughMoney") {
-                            document.getElementById("openedItem").classList.remove('hidden');
-                            document.getElementById("background").style.filter = "blur(5px)";
+                            document.querySelector(".openedItem").classList.remove('hidden');
+                            document.querySelector(".background").style.filter = "blur(5px)";
                         }
                     } else {
                         location.reload();

@@ -48,6 +48,10 @@ Route::get('/market', function () {
     return view('market');
 });
 
+Route::get('/profiles', function () {
+    return view('profiles');
+});
+
 Route::get('/profile/{login}', function ($login=false) {
     return view('inventory', ["login" => $login]);
 });

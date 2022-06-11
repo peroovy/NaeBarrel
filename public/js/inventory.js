@@ -88,13 +88,12 @@ fetch("/api/clients/" + clientLogin + "/inventory", {
                 document.querySelector('.openedItem').id = item['inv_id'];
                 document.querySelector('.background').style.filter = "blur(5px)";
 
-                document.querySelector('.actually-drop-size').src = '../pic/fish.png';
+                document.querySelector('.actually-drop-size').src = item['picture'];
                 document.querySelector('.actually-drop-name').textContent = item['name'];
             };
         }
-
         let img = document.createElement('img');
-        img.src = '../pic/fish.png';
+        img.src = item['picture'];
         img.classList.add('fish-size');
         block.append(img);
 

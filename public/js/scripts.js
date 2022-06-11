@@ -17,10 +17,11 @@ fetch("/api/cases", {
         let e = document.createElement('div');
         e.classList.add('barrel');
 
-        let img = document.createElement('img');
-        img.classList.add('barrel-size');
-        img.src = '../pic/barrels.png';
-        e.append(img);
+        let tables = document.createElement('img');
+        tables.classList.add('barrel-size');
+        tables.src = '../pic/tables.png';
+        tables.style.backgroundImage = "url('" + elem['picture'] + "')";
+        e.append(tables);
 
         let price = document.createElement('p');
         price.classList.add('price');

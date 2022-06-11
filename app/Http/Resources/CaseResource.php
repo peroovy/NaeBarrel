@@ -19,6 +19,7 @@ class CaseResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'price' => $this->price,
+            'picture' => $this->picture,
             'items' => ItemResource::collection($this->items())
         ];
     }

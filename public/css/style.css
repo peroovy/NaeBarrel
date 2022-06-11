@@ -159,9 +159,9 @@ body {
 
 
 .fish-size {
-    padding-left: 2vh;
+    padding: 2vh;
     width: 16vh;
-    height: auto;
+    height: 12vh;
 }
 
 .iname {
@@ -285,7 +285,7 @@ body {
 
 .drop {
     width: 20vh;
-    height: auto;
+    height: 16vh;
     border-radius: 2.5vh;
 }
 

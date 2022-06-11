@@ -54,7 +54,6 @@ class CaseApiController extends Controller
 
         if ($withItems) {
             try {
-
                 $items = json_decode($request['items']);
             } catch (JsonException $e) {
                 return response(status: 400);

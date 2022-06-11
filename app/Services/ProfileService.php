@@ -123,7 +123,7 @@ class ProfileService
     }
 
     public function DeleteProfile(string|int $identifier) {
-        $client = $this->clientsService->get_client_by_identifier($identifier);
+        $client = $this->clientsService->getClientByIdentifier($identifier);
         $client->dead = true;
         $client->save();
         return response(status: 200);

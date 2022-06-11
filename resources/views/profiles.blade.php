@@ -12,7 +12,7 @@
         <div class="profile-balance"></div> <!--Сюда баланс-->
         <div class="profile"></div> <!--Сюда авы подгружайте-->
         <div class="profiles-list"> <!--Тут гуглите Repeat-нотацию для grid-->
-            
+
         </div>
     </div>
     <script src="{{URL::asset('js/profiles.js')}}"></script>

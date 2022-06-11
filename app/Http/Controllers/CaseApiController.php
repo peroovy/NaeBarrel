@@ -16,6 +16,8 @@ use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Nette\Utils\Json;
+use Nette\Utils\JsonException;
 
 class CaseApiController extends Controller
 {
@@ -39,10 +41,7 @@ class CaseApiController extends Controller
             "name" => ["required", "string"],
             "description" => ["required", "string"],
             "price" => ["required", "numeric"],
-            "picture" => ["required", "file", "mimes:jpeg,jpg,png"],
-            "items" => ["sometimes", "array"],
-            "items.*.id" => ["required", "numeric"],
-            "items.*.chance" => ["required", "numeric", "gt:0"],
+            "picture" => ["required", "file", "mimes:jpeg,jpg,png"]
         ]);
 
         if ($validator->fails()) {
@@ -51,7 +50,18 @@ class CaseApiController extends Controller
 
         $withItems = array_key_exists("items", $request->all());
 
-        if ($withItems && !$this->caseService->validateItems($request["items"]))
+        $items = null;
+
+        if ($withItems) {
+            try {
+
+                $items = json_decode($request['items']);
+            } catch (JsonException $e) {
+                return response(status: 400);
+            }
+        }
+
+        if ($withItems && !$this->caseService->validateItems($items))
             return response(status: 422);
 
         $case = $this->caseService->createCase(
@@ -59,7 +69,7 @@ class CaseApiController extends Controller
             $request["description"],
             $request["price"],
             $request->file("picture"),
-            $withItems ? $request["items"] : []);
+            $withItems ? $items : []);
 
         return $case ? new CaseResource($case) : response(status: 400);
     }

@@ -55,3 +55,7 @@ Route::get('/profiles', function () {
 Route::get('/profile/{login}', function ($login=false) {
     return view('inventory', ["login" => $login]);
 });
+
+Route::get('/case/create', function () {
+    return view('casecreate');
+})->middleware('moderator');

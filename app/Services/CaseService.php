@@ -55,8 +55,8 @@ class CaseService
             foreach ($items as $item) {
                 $case_items[] = [
                     "case_id" => $case->id,
-                    "item_id" => $item["id"],
-                    "chance" => $item["chance"]
+                    "item_id" => $item->id,
+                    "chance" => $item->chance
                 ];
             }
             CaseItem::insert($case_items);
@@ -101,8 +101,8 @@ class CaseService
         if (count($items) == 0)
             return true;
 
-        $ids = array_map(fn (array $item) => $item["id"], $items);
-        $probability = array_sum(array_map(fn (array $item) => $item["chance"], $items));
+        $ids = array_map(fn ($item) => $item->id, $items);
+        $probability = array_sum(array_map(fn ($item) => $item->chance, $items));
 
         return count($ids) == Item::findMany($ids)->count() && abs($probability - 1) < self::$EPS;
     }

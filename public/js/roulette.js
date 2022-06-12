@@ -83,6 +83,11 @@ fetch("/api/cases/" + barrelId, {
         dropName.textContent = item['name'];
         drop.append(dropName);
 
+        let dropChance = document.createElement('p');
+        dropChance.classList.add('drop-chance');
+        dropChance.textContent = parseFloat(item['chance']) * 100 + "%";
+        drop.append(dropChance);
+
         dropList.append(drop);
     })
 

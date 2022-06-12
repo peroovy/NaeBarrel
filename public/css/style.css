@@ -297,6 +297,16 @@ body {
     border-radius: 2.5vh;
 }
 
+.drop-chance {
+    position: absolute;
+    display: block;
+    background: rgba(255, 238, 180, 0.75);
+    border-radius: 10px;
+    text-align: center;
+    font-size: 3vh;
+    top: 20%;
+}
+
 .common {
     background-color: #D29E3A;
 }

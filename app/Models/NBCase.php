@@ -44,6 +44,6 @@ class NBCase extends Model
         return $this->hasManyThrough(Item::class, CaseItem::class,
         'case_id', 'id', 'id', 'item_id')
             ->select('items.*', 'case_item.chance')
-            ->get();
+            ->get()->sortBy('quality');
     }
 }

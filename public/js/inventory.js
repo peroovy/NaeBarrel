@@ -64,8 +64,10 @@ updateBal();
 let list = document.querySelector('.inv-list');
 
 let rarity = {
-    3: 'common',
-    4: 'rare'
+    1: 'common',
+    2: 'rare',
+    3: 'superrare',
+    4: 'rarest'
 };
 
 let myProfile = false;

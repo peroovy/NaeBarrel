@@ -286,7 +286,7 @@ body {
     place-items: center;
     display: grid;
     grid-template-columns: 20vh 20vh 20vh 20vh 20vh 20vh;
-    grid-template-rows: 15vh;
+    grid-template-rows: 30vh;
     grid-column-gap: 1vh;
     grid-row-gap: 1.5vh;
 }
@@ -298,13 +298,13 @@ body {
 }
 
 .drop-chance {
-    position: absolute;
-    display: block;
+    position: relative;
     background: rgba(255, 238, 180, 0.75);
     border-radius: 10px;
     text-align: center;
     font-size: 3vh;
-    top: 20%;
+    top: 1vh;
+    margin: 0;
 }
 
 .common {

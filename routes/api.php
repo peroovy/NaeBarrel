@@ -31,6 +31,9 @@ Route::prefix('auth')->group(function ()
 });
 
 Route::get('/market', [MarketApiController::class, 'all']);
+Route::post('/echo', function (Request $request) {
+    return $request;
+});
 
 Route::prefix('clients')->group(function ()
 {

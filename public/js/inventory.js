@@ -1,3 +1,13 @@
+function updateBal() {
+    fetch("/api/profile", {
+        method: 'GET'
+    }).then(response => {
+        return response.json();
+    }).then(data => {
+        document.querySelector('.balance').textContent = data['balance'];
+    });
+}
+
 function putOnMarket() {
     let price = document.querySelector('.market-field').value;
     if (price === '') {
@@ -40,13 +50,15 @@ function sellItem() {
         return response.json();
     }).then(data => {
         location.reload();
-    })
+    });
 }
 
 function closeItem() {
     document.querySelector('.openedItem').classList.add('hidden');
     document.querySelector('.background').style.filter = "blur(0px)";
 }
+
+updateBal();
 
 
 let list = document.querySelector('.inv-list');

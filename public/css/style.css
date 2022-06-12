@@ -62,6 +62,14 @@ body {
     padding-bottom: 10vh;
 }
 
+.balance {
+    position: absolute;
+    top: 1.2vh;
+    left: 1vh;
+    font-size: 3vh;
+    margin: 0;
+}
+
 .profile-card {
     margin: 1vh;
     width: 100vh;

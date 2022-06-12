@@ -3,6 +3,18 @@ function closeBarrel(){
     document.getElementById("background").style.filter = "blur(0px)";
 }
 
+function updateBal() {
+    fetch("/api/profile", {
+        method: 'GET'
+    }).then(response => {
+        return response.json();
+    }).then(data => {
+        document.querySelector('.balance').textContent = data['balance'];
+    });
+}
+
+updateBal();
+
 let list = document.querySelector('.inv-list');
 
 let rarity = {

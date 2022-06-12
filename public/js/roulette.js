@@ -2,6 +2,16 @@ if (!barrelId) {
     window.location.href = "/";
 }
 
+function updateBal() {
+    fetch("/api/profile", {
+        method: 'GET'
+    }).then(response => {
+        return response.json();
+    }).then(data => {
+        document.querySelector('.balance').textContent = data['balance'];
+    });
+}
+
 function openBarrel(){
     document.getElementById("openedItem").classList.remove('hidden');
     document.getElementById("background").style.filter = "blur(5px)";
@@ -29,6 +39,7 @@ function openBarrel(){
     }).then(data => {
         document.querySelector(".actually-drop-size").src = data['picture'];
         document.querySelector(".actually-drop-name").textContent = data["name"];
+        updateBal();
     });
 
 }
@@ -37,6 +48,8 @@ function closeBarrel(){
     document.getElementById("openedItem").classList.add('hidden');
     document.getElementById("background").style.filter = "blur(0px)";
 }
+
+updateBal();
 
 let rarity = {
     3: 'common',

@@ -9,7 +9,9 @@
 <body>
 <div class="background">
     <img src="{{URL::asset('pic/NaeBarrelIcon.png')}}" class="icon">
-    <div class="profile-balance"></div> <!--Сюда баланс-->
+    <div class="profile-balance">
+        <p class="balance"></p>
+    </div> <!--Сюда баланс-->
     <div class="profile"></div> <!--Сюда авы подгружайте-->
     <div class="inv-list"> <!--Тут гуглите Repeat-нотацию для grid-->
 

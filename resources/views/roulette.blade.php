@@ -15,7 +15,9 @@
 <body>
     <div class="background" id="background">
         <img src="{{URL::asset('pic/NaeBarrelIcon.png')}}" class="icon">
-        <div class="profile-balance"></div> <!--Сюда баланс-->
+        <div class="profile-balance">
+            <p class="balance"></p>
+        </div> <!--Сюда баланс-->
         <div class="profile"></div> <!--Сюда авы подгружайте-->
         <div class="barrel-name">Barrel-Name</div>
         <div class="openbarrel">
